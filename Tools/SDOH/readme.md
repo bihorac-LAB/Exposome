@@ -14,7 +14,7 @@ Input a csv file with latitude longitude and patient encounter date information.
 
 -long: Longitude column name
 #### Example:
-python LatLong_to_FIPS_SDoH_Mapper.py -i -i "C:/Users/j.yu1/Desktop/SDOH/Demo_address_lat.csv"  -d visit_start_date -lat Latitude -long Longitude
+python LatLong_to_FIPS_SDoH_Mapper.py  -i "C:/Users/j.yu1/Desktop/SDOH/Demo_address_lat.csv"  -d visit_start_date -lat Latitude -long Longitude
 ### Output - what does the script return? 
 Sample input file
 Sample output file
