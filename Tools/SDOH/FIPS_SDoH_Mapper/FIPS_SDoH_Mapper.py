@@ -14,7 +14,7 @@ def sdoh_linkage(df, args):
     df = df.rename(columns={args.f: 'FIPS'})
     df['FIPS'] = df['FIPS'].apply(lambda x: str(x).split('.')[0])
 
-    DATABASE_URL = "postgresql://admin:adminpassword123!!!@10.14.134.118:39432/SDoH"
+    DATABASE_URL = ""
     engine = create_engine(DATABASE_URL)
 
     all_data_frames = []
