@@ -8,9 +8,10 @@ Welcome to the SDoH Repository, which contains scripts designed to map and link 
 
 #### Description:
 
-This script Processes a CSV file with patient addresses and encounter dates, uses DeGAUSS to geocode addresses to coordinates and FIPS codes, and links encounter data to SDOH database using FIPS codes.
+This script processes a CSV file with patient addresses and encounter dates, uses DeGAUSS to geocode addresses to coordinates and FIPS codes, and links encounter data to SDoH database using FIPS codes. The output file is a CSV file with geocoded coordinates, FIPS and SDoH-linked data.
 
-![image](https://github.com/user-attachments/assets/d41ed4a7-da02-4553-b601-174ab13eb717)
+![image](https://github.com/user-attachments/assets/f847bf79-c381-46ed-a54b-52bf0eea376b)
+
 
 #### Required input:
 -i：Input file path
@@ -36,9 +37,10 @@ python Address_to_FIPS_SDoH_Mapper.py -i "./Demo_address.csv" -d visit_start_dat
 
 #### Description:
 
-This script uses DeGAUSS to convert latitude and longitude coordinates from a CSV file into FIPS codes, and links encounter data to SDOH database using FIPS codes.
+This script uses DeGAUSS to convert latitude and longitude coordinates from a CSV file into FIPS codes, and links encounter data to SDoH database using FIPS codes. The output file is a CSV file with geocoded coordinates, FIPS and SDoH-linked data.
 
-![image](https://github.com/user-attachments/assets/b620783e-7c62-4c8b-aabf-100552e7b192)
+![image](https://github.com/user-attachments/assets/8f63617c-68d0-48d7-b9a5-d4252ad8cf6e)
+
 
 #### Required input：
 -i：Input file path
@@ -62,9 +64,10 @@ python LatLong_to_FIPS_SDoH_Mapper.py  -i "./Demo_address_lat.csv"  -d visit_sta
 
 #### Description:
 
-Inputs a CSV file containing FIPS codes and patient encounter information with date, and links encounter data to SDOH database using FIPS codes.
+Inputs a CSV file containing FIPS codes and patient encounter information with date, and links encounter data to SDoH database using FIPS codes. The output file is a CSV file with geocoded FIPS and SDoH-linked data.
 
-![image](https://github.com/user-attachments/assets/a881476a-cc69-4984-8616-94acac911210)
+![image](https://github.com/user-attachments/assets/ca48e790-dd60-418b-8620-904358c55c10)
+
 
 #### Required input:
 -i：Input file path
@@ -84,9 +87,9 @@ python FIPS_SDoH_Mapper.py -i "./Demo_address_fips.csv" -d visit_start_date -f F
 
 ### 4. OMOP_SDOH_mapping.py
 #### Description:
-This script establishes a connection to an OMOP database using specified credentials and links patient encounters to SDOH data.
+This script establishes a connection to an OMOP database using specified credentials and links patient encounters to SDoH data.
 
-![image](https://github.com/user-attachments/assets/0d79814b-4300-4222-b7b0-bd861a200a4c)
+![image](https://github.com/user-attachments/assets/7ce17900-eae9-45b1-a1eb-623cf6065ad2)
 
 #### Required input:
 --user: Database username
@@ -100,5 +103,5 @@ This script establishes a connection to an OMOP database using specified credent
 --database: Database name
 
 #### Example usage:
-python OMOP_SDOH_mapping.py --user xxx --password xxx --server xxx --port xxx --database xxx
+python OMOP_SDoH_mapping.py --user xxx --password xxx --server xxx --port xxx --database xxx
 
