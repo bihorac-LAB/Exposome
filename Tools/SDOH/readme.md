@@ -1,6 +1,6 @@
 
-# CHoRUS Repository Documentation
-Welcome to the CHoRUS Repository, which contains scripts designed to map and link geographic data to Social Determinants of Health (SDOH) using various data inputs. Below, you will find detailed documentation for each script, including usage instructions and expected inputs and outputs.
+# SDoH Repository Documentation
+Welcome to the SDoH Repository, which contains scripts designed to map and link geographic data to Social Determinants of Health (SDoH) using various data inputs. Below, you will find detailed documentation for each script, including usage instructions and expected inputs and outputs.
 
 ## Scripts Overview
 
