@@ -85,7 +85,7 @@ python FIPS_SDoH_Mapper.py -i "./Demo_address_fips.csv" -d visit_start_date -f F
  
 
 
-### 4. OMOP_SDOH_mapping.py
+### 4. OMOP_SDoH_mapping.py
 #### Description:
 This script establishes a connection to an OMOP database using specified credentials and links patient encounters to SDoH data.
 
