@@ -196,7 +196,7 @@ def sdoh_linkage(df, date_column, output_file_path):
     df['year'] = df['year'].clip(lower=2012, upper=2023)
     df['FIPS'] = df['FIPS'].apply(lambda x: str(x).split('.')[0])
 
-    DATABASE_URL = "postgresql://admin:adminpassword123!!!@10.14.134.118:39432/SDoH"
+    DATABASE_URL = "postgresql:"
     engine = create_engine(DATABASE_URL)
 
     all_data_frames = []
