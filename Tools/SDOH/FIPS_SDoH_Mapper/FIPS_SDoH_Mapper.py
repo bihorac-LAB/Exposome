@@ -6,7 +6,7 @@ import argparse
 import logging
 from sqlalchemy import create_engine
 
-#this version is conbined all year csv output in one csv file(keep the original datasets column name)
+#Link to SDoH database using FIPS code and date. This version is conbined all year csv output in one csv file(keep the original datasets column name)
 def sdoh_linkage(df, args):
     df[args.date] = pd.to_datetime(df[args.date])
     df['year'] = df[args.date].dt.year
@@ -24,7 +24,7 @@ def sdoh_linkage(df, args):
         fips_condition = f"geocode IN ({fips_list})"
         
         logging.debug(f"Year: {year}, FIPS condition: {fips_condition}")
-
+        #Find the index table
         data_source_query = f"""
         SELECT variables_index_name
         FROM data.data_source 
@@ -40,7 +40,7 @@ def sdoh_linkage(df, args):
         if variables_index_df.empty:
             logging.warning(f"No data found in data source for year {year}. Exiting function.")
             continue
-
+        # Mapping for the vairable table
         for _, v_row in variables_index_df.iterrows():
             variable_table_name = v_row['variables_index_name'][:-6] + '_variables'
             variable_table_query = f"""
@@ -59,7 +59,7 @@ def sdoh_linkage(df, args):
 
             variable_table_df['effective_start_timestamp'] = pd.to_datetime(variable_table_df['effective_start_timestamp'])
             variable_table_df['effective_end_timestamp'] = pd.to_datetime(variable_table_df['effective_end_timestamp'])
-
+            #Link to SDoH database using FIPS code and date column
             filtered_df = variable_table_df[(variable_table_df['geocode'].isin(group_df['FIPS'])) &
                                             (variable_table_df['effective_start_timestamp'] <= group_df[args.date].max()) &
                                             (variable_table_df['effective_end_timestamp'] >= group_df[args.date].min())]
