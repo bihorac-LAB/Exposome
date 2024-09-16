@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
-
+# Generate latitude and longitude from address infomation
 def generate_coordinates_degauss(inputdata, columns, threshold):
     # Load the data
     if inputdata.endswith('.csv'):
@@ -74,7 +74,7 @@ def generate_coordinates_degauss(inputdata, columns, threshold):
     df.to_csv(output_file_name, index=False)
     return output_file_name
 
-
+#Generate the FIPS code from latitude and longitude
 def generate_fips_degauss(input_file, year):
     print('Generating FIPS...')
     # Map the year to the nearest supported year
@@ -105,7 +105,7 @@ def generate_fips_degauss(input_file, year):
         print(f"Expected output file not found: {output_file}")
         return None
 
-#this version is conbined all year csv output in one csv file(keep the original datasets column name)
+#Link to SDoH database using fips code and date column.This version is conbined all year csv output in one csv file(keep the original datasets column name)
 def sdoh_linkage(df, args):
     df[args.date] = pd.to_datetime(df[args.date])
     df['year'] = df[args.date].dt.year
@@ -123,7 +123,7 @@ def sdoh_linkage(df, args):
         fips_condition = f"geocode IN ({fips_list})"
         
         logging.debug(f"Year: {year}, FIPS condition: {fips_condition}")
-
+        #Find the index table
         data_source_query = f"""
         SELECT variables_index_name
         FROM data.data_source 
@@ -254,7 +254,7 @@ def main():
 
             print("Years in 2010 file:", fips_df_2010[args.date].dt.year.unique())
             print("Years in 2020 file:", fips_df_2020[args.date].dt.year.unique())
-
+            #Keep year < 2020 in fips 2010 version, keep year >= 2020 in fips 2020 version
             fips_df_2010 = fips_df_2010[fips_df_2010[args.date].dt.year < 2020]
             fips_df_2020 = fips_df_2020[fips_df_2020[args.date].dt.year >= 2020]
 
