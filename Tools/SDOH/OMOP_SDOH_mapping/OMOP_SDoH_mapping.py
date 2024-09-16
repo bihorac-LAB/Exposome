@@ -9,6 +9,7 @@ import logging
 from sqlalchemy import create_engine
 import concurrent.futures
 
+#extract required info from OMOP database
 def omop_extraction(user, password, server, port, database):
     """
     Executes three SQL queries in parallel to categorize data based on the validity of latitude, longitude, and address_1.
@@ -16,6 +17,7 @@ def omop_extraction(user, password, server, port, database):
     """
     conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server},{port};DATABASE={database};UID={user};PWD={password}'
     base_directory = './Linkage_data'
+    #divide into three part
     categories = {
         'Latlong': 'valid_lat_long',
         'Invalid': 'invalid_lat_lon_address',
@@ -102,6 +104,7 @@ def omop_extraction(user, password, server, port, database):
         futures = [executor.submit(fetch_and_save, category, query) for category, query in queries.items()]
         concurrent.futures.wait(futures)  # Wait for all tasks to complete
 
+#Generate latitude and longitude from address infomation
 def generate_coordinates_degauss(df, columns, threshold):
 #     # Load the data
 #     if inputdata.endswith('.csv'):
@@ -159,6 +162,7 @@ def generate_coordinates_degauss(df, columns, threshold):
 #     df.to_csv(output_file_name, index=False)
     return output_file_name
 
+#Generate the FIPS code from latitude and longitude
 def generate_fips_degauss(df, year):
     print('Generating FIPS...')
 
@@ -189,7 +193,7 @@ def generate_fips_degauss(df, year):
         print(f"Expected output file not found: {output_file}")
         return None
 
-#this version is conbined all year csv output in one csv file(keep the original datasets column name)
+#Link to SDoH database using fips code and date column.This version is conbined all year csv output in one csv file(keep the original datasets column name)
 def sdoh_linkage(df, date_column, output_file_path):
     df[date_column] = pd.to_datetime(df[date_column])
     df['year'] = df[date_column].dt.year
@@ -207,7 +211,8 @@ def sdoh_linkage(df, date_column, output_file_path):
         fips_condition = f"geocode IN ({fips_list})"
         
         logging.debug(f"Year: {year}, FIPS condition: {fips_condition}")
-
+        
+        #Find the index table
         data_source_query = f"""
         SELECT variables_index_name
         FROM data.data_source 
@@ -265,7 +270,7 @@ def sdoh_linkage(df, date_column, output_file_path):
 
             variable_table_df['effective_start_timestamp'] = pd.to_datetime(variable_table_df['effective_start_timestamp'])
             variable_table_df['effective_end_timestamp'] = pd.to_datetime(variable_table_df['effective_end_timestamp'])
-
+            #Link to SDoH database using FIPS code and date column
             filtered_df = variable_table_df[(variable_table_df['geocode'].isin(group_df['FIPS'])) &
                                             (variable_table_df['effective_start_timestamp'] <= group_df[date_column].max()) &
                                             (variable_table_df['effective_end_timestamp'] >= group_df[date_column].min())]
@@ -299,7 +304,7 @@ def sdoh_linkage(df, date_column, output_file_path):
     engine.dispose()
     
 
-    
+#This function run three parts of category   
 def process_directory(directory):
     # Set base configurations
     output_base = './Linkage_result'
@@ -331,14 +336,13 @@ def process_directory(directory):
 #             output_dir = os.path.join(output_base, process_type)
 #             os.makedirs(output_dir, exist_ok=True)
 
+        # Simply copy files to the new directory
         if process_type == 'invalid':
-                # Simply copy files to the new directory
             final_output = os.path.join(output_dir, f'{process_type}_no_linkage_{idx+1}.csv')
             shutil.copy(filepath, final_output)
             print(f"Invalid file to {final_output}")
-#             continue
             
-            
+        # Call function to generate coordinates, fips and link to SDoH databse.    
         if process_type == 'address':
             final_output = os.path.join(output_dir, f'{process_type}_linkaged_SDoH_{idx+1}.csv')
             # Process starting from geocoding
@@ -358,7 +362,7 @@ def process_directory(directory):
             for year in [2010, 2020]:
                 generate_fips_degauss(df, year)
                 
-#                     # Load both FIPS files if available
+            # Load both FIPS files if available
             fips_file_2010 = "preprocessed_2_census_block_group_0.6.0_2010.csv"
             fips_file_2020 = "preprocessed_2_census_block_group_0.6.0_2020.csv"
     
@@ -368,7 +372,8 @@ def process_directory(directory):
                     
                 fips_df_2010[date_column] = pd.to_datetime(fips_df_2010[date_column], errors='coerce')
                 fips_df_2020[date_column] = pd.to_datetime(fips_df_2020[date_column], errors='coerce')
-                    
+                
+                #Keep year < 2020 in fips 2010 version, keep year >= 2020 in fips 2020 version
                 fips_df_2010 = fips_df_2010[fips_df_2010[date_column].dt.year < 2020]
                 fips_df_2020 = fips_df_2020[fips_df_2020[date_column].dt.year >= 2020]
 
@@ -384,22 +389,20 @@ def process_directory(directory):
                     os.rename(default_index_file, new_index_file)
                     print(f"Index file renamed to {new_index_file}")
             print("Address processing to be implemented.")
-                
-                
-                
+                                
+        # Call function to genrate fips code and link to SDoH database        
         elif process_type == 'latlong':
-                # Process starting from FIPS generation
+            # Process starting from FIPS generation
              final_output = os.path.join(output_dir, f'{process_type}_linkaged_SDoH_{idx+1}.csv')
-             df = pd.read_csv(filepath)
-                
+             df = pd.read_csv(filepath)  
              df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
              df[date_column] = pd.to_datetime(df[date_column], errors='coerce')
-               # Map year based on date_column and clip to either 2010 or 2020
+             # Map year based on date_column and clip to either 2010 or 2020
              df['year'] = df[date_column].dt.year.apply(lambda x: 2010 if x < 2020 else 2020)
              for year in [2010, 2020]:
                  fips_file = generate_fips_degauss(df, year)
                     
-#                  # Load both FIPS files if available
+             # Load both FIPS files if available
              fips_file_2010 = "preprocessed_2_census_block_group_0.6.0_2010.csv"
              fips_file_2020 = "preprocessed_2_census_block_group_0.6.0_2020.csv"
     
@@ -410,6 +413,7 @@ def process_directory(directory):
                  fips_df_2010[date_column] = pd.to_datetime(fips_df_2010[date_column], errors='coerce')
                  fips_df_2020[date_column] = pd.to_datetime(fips_df_2020[date_column], errors='coerce')
                     
+                 #Keep year < 2020 in fips 2010 version, keep year >= 2020 in fips 2020 version   
                  fips_df_2010 = fips_df_2010[fips_df_2010[date_column].dt.year < 2020]
                  fips_df_2020 = fips_df_2020[fips_df_2020[date_column].dt.year >= 2020]
 
@@ -441,7 +445,7 @@ def main():
     
     # Call the function with parsed arguments
     omop_extraction(args.user, args.password, args.server, args.port, args.database)
-    
+    #Call function in different directory
     process_directory('./Linkage_data/invalid_lat_lon_address')
     process_directory('./Linkage_data/valid_address')
     process_directory('./Linkage_data/valid_lat_long')
