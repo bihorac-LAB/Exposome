@@ -6,6 +6,7 @@ import argparse
 import logging
 from sqlalchemy import create_engine
 
+# Generate the FIPS code using latitude and longitude
 def generate_fips_degauss(input_file, year, lat_col, long_col):
      # Load the data
     if input_file.endswith('.csv'):
@@ -50,7 +51,7 @@ def generate_fips_degauss(input_file, year, lat_col, long_col):
         print(f"Expected output file not found: {output_file}")
         return None
 
-#this version is conbined all year csv output in one csv file(keep the original datasets column name)
+#Link to SDoH database using FIPS code and date. This version is conbined all year csv output in one csv file(keep the original datasets column name)
 def sdoh_linkage(df, args):
     df[args.date] = pd.to_datetime(df[args.date])
     df['year'] = df[args.date].dt.year
@@ -69,6 +70,7 @@ def sdoh_linkage(df, args):
         
         logging.debug(f"Year: {year}, FIPS condition: {fips_condition}")
 
+     # FInd the index table 
         data_source_query = f"""
         SELECT variables_index_name
         FROM data.data_source 
@@ -126,7 +128,7 @@ def sdoh_linkage(df, args):
 
             variable_table_df['effective_start_timestamp'] = pd.to_datetime(variable_table_df['effective_start_timestamp'])
             variable_table_df['effective_end_timestamp'] = pd.to_datetime(variable_table_df['effective_end_timestamp'])
-
+            # Link to the SDoH database when data between effective_start_timestamp and effective_end_timestamp.
             filtered_df = variable_table_df[(variable_table_df['geocode'].isin(group_df['FIPS'])) &
                                             (variable_table_df['effective_start_timestamp'] <= group_df[args.date].max()) &
                                             (variable_table_df['effective_end_timestamp'] >= group_df[args.date].min())]
@@ -198,7 +200,7 @@ def main():
 
             print("Years in 2010 file:", fips_df_2010[args.date].dt.year.unique())
             print("Years in 2020 file:", fips_df_2020[args.date].dt.year.unique())
-
+            #Keep year < 2020 in fips 2010 version, keep year >= 2020 in fips 2020 version
             fips_df_2010 = fips_df_2010[fips_df_2010[args.date].dt.year < 2020]
             fips_df_2020 = fips_df_2020[fips_df_2020[args.date].dt.year >= 2020]
 
