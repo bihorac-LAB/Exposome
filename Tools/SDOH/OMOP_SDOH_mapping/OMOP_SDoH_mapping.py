@@ -10,7 +10,7 @@ from sqlalchemy import create_engine
 import concurrent.futures
 
 #extract required info from OMOP database
-def omop_extraction(user, password, server, port, database):
+def omop_extract_and_save_data(user, password, server, port, database):
     """
     Executes three SQL queries in parallel to categorize data based on the validity of latitude, longitude, and address_1.
     Each query's results are saved in different directories in batches of 100000 rows per CSV.
@@ -327,7 +327,7 @@ def process_directory(directory):
     
     output_dir = os.path.join(output_base, process_type)
     os.makedirs(output_dir, exist_ok=True)
-    print(process_type)
+    logging.info(process_type)
     # Set base configurations
     for idx, filename in enumerate(sorted(os.listdir(directory))):
         filepath = os.path.join(directory, filename)
@@ -444,7 +444,7 @@ def main():
     args = parser.parse_args()
     
     # Call the function with parsed arguments
-    omop_extraction(args.user, args.password, args.server, args.port, args.database)
+    omop_extract_and_save_data(args.user, args.password, args.server, args.port, args.database)
     #Call function in different directory
     process_directory('./Linkage_data/invalid_lat_lon_address')
     process_directory('./Linkage_data/valid_address')
