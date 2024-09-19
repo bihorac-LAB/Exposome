@@ -47,7 +47,7 @@ This guide outlines the steps required to prepare input data for Social Determin
 | FIPS |
 |----------|
 | 12011080103 |
-| 12011080103 | 
+| 12103026400 | 
 
 
 **Note**:  If you obtain Census tract information for patients, you can skip preparing coordinate information.
@@ -61,6 +61,45 @@ This guide outlines the steps required to prepare input data for Social Determin
 - Patient encounter ID (e.g., 12345)
 - Patient encounter year (e.g., 2024)
 - Address or coordinates information (refer to Step 1 for details)
+
+**Example usage:**
+
+*option 1:*
+
+python Address_to_FIPS.py -i "./Demo_address.csv" -d year --columns street city state zip
+
+![image](https://github.com/user-attachments/assets/882367f2-5f6b-4f0d-91de-c8c5a232d7f9)
+
+
+*option 2:*
+
+python Address_to_FIPS.py -i "./Demo_address.csv" -d year --columns address
+
+![image](https://github.com/user-attachments/assets/3c0129da-7ce2-411d-9b6a-ea5d67532fac)
+
+
+*option 3:*
+
+python Address_to_FIPS.py -i "./Demo_address.csv" -d year -lat Latitude -long Longitude
+
+![image](https://github.com/user-attachments/assets/3cdb2094-a786-4574-adfe-7d208a034219)
+
+
+**Sample output:**
+
+*option 1:*
+
+![image](https://github.com/user-attachments/assets/58a055d5-d634-4d99-bac1-b3a6dd1db140)
+
+
+*option 2:*
+
+![image](https://github.com/user-attachments/assets/caea7ea3-bf40-46f2-8565-3689bcc24620)
+
+
+*option 3:*
+
+![image](https://github.com/user-attachments/assets/bbd9e960-ffdb-4c19-aa1e-fe929e8a3221)
 
 
 ### Case 2: OMOP format
@@ -83,6 +122,16 @@ This guide outlines the steps required to prepare input data for Social Determin
 - `port`: port number
 - `database`: database name for OMOP
 
+**Example usage:**
+
+python OMOP_to_FIPS.py --user xxx --password xxx --server xxx --port xxx --database xxx
+
+**Sample output:**
+
+![image](https://github.com/user-attachments/assets/17d6285d-0491-418b-9e81-03bd19eccfc1)
+
+
+
 ## Step 3: SDOH Linkage Process
 
 ### Getting Started
@@ -97,12 +146,17 @@ Prepare your CSV file to include the following columns:
 - `year`
 - `FIPS`
 
-**Example**:
+**Example input**:
 
-| person_id | visit_occurrence_id | year | FIPS        |
-|-----------|---------------------|------|-------------|
-| 1         | 11                  | 2012 | 12011080103 |
-| 2         | 22                  | 2022 | 12103026400 |
+![image](https://github.com/user-attachments/assets/9e56aa19-7406-400a-9064-51852be48f37)
+
+
+**Example output**:
+
+![image](https://github.com/user-attachments/assets/39c02650-151b-4577-aa8f-38f8800bb223)
+
+
+
 
 ### Processing and Results
 - **Processing**: After uploading your CSV file, our system will automatically execute the necessary Python script in the backend to perform SDOH linkage.
