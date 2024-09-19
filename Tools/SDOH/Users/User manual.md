@@ -2,7 +2,7 @@
 
 ## Step 1: Preparing Input Data
 
-This guide outlines the steps required to prepare input data for Social Determinants of Health (SDOH) linkage using geographic information. Users need to prepare only **ONE** of the following data types per patient: address, coordinates, or census tract information.
+This guide outlines the steps required to prepare input data for Social Determinants of Health (SDOH) linkage using geographic information. Users need to prepare only **ONE** of the following data types encounter: address, coordinates, or census tract information.
 
 ### Option 1. Address information 
 #### Prepare a CSV file with formatted address data using one of the following acceptable formats:
