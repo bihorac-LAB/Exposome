@@ -3,7 +3,7 @@
 
 ## Step 1: Preparing Input Data
 
-This guide outlines the steps required to prepare input data for Social Determinants of Health (SDOH) linkage using geographic information. Users need to prepare only **ONE** of the following data types for each encounter: address, coordinates, or census tract information.
+This guide outlines the steps required to prepare input data for linking Social Determinants of Health (SDOH) using geographic information. The Census Tract (FIPS 11 code) is the key geographic identifier used to connect data to the SDOH database. Step 1 is used to prepare the information for generating FIPS11 code, and step 2 is to generate FIPS code using toolkit. Users need to prepare only **ONE** of the following data types for each encounter: address, coordinates, or census tract information.
 
 ### Option 1. Address information 
 #### Prepare a CSV file with formatted address data using one of the following acceptable formats:
@@ -17,10 +17,10 @@ This guide outlines the steps required to prepare input data for Social Determin
 |2001 Sw 16Th St Gainesville Fl 32608 | 
 
 #### Format B: Multi-Column Address
-- **Columns**: `Street`, `City`, `State`, `Zip`
+- **Columns**: `street`, `city`, `state`, `zip`
 - **Example**:
    
-| Street | City | State | Zip |
+| street | city | state | zip |
 |----------|----------|----------|----------|
 | 1250 W 16th St | Jacksonville | FL | 32209 |
 | 2001 SW 16th St | Gainesville | FL | 32608 |
@@ -50,9 +50,9 @@ This guide outlines the steps required to prepare input data for Social Determin
 | 12103026400 | 
 
 
-**Note**:  If you obtain Census tract information for patients, you can skip preparing coordinate information.
+**Note**:  If you already have Census tract information for patients, you can skip preparing coordinate information.
 
-## Step 2: Using Python Scripts to Retrieve Census Tract Information
+## Step 2: Using Toolkit to Retrieve Census Tract Information
 ### Case 1: csv format
 
 ![image](https://github.com/user-attachments/assets/a1c5b366-dd78-4173-8ae7-33537e2a1bbc)
@@ -61,6 +61,18 @@ This guide outlines the steps required to prepare input data for Social Determin
 - Patient encounter ID (e.g., 12345)
 - Patient encounter year (e.g., 2024)
 - Address or coordinates information (refer to Step 1 for details)
+
+**Python scripts input:**
+
+- -i：Input file path *(required)*
+
+- -y：Patient encounter year  *(required)*
+
+- --columns: Column names for address(if you have separate columns for address please input in this order: street, city, state, zip. If you just have one column for address, input the address column name, eg:address)  *(optional)*
+
+- -lat: Latitude column name *(optional)*
+
+- -long: Longitude column name *(optional)*
 
 **Example usage:**
 
@@ -80,9 +92,9 @@ python Address_to_FIPS.py -i "./Demo_address.csv" -d year --columns address
 
 *option 3:*
 
-python Address_to_FIPS.py -i "./Demo_address.csv" -d year -lat Latitude -long Longitude
+python Address_to_FIPS.py -i "./Demo_address.csv" -d year -lat latitude -long longitude
 
-![image](https://github.com/user-attachments/assets/3cdb2094-a786-4574-adfe-7d208a034219)
+![image](https://github.com/user-attachments/assets/345fc88a-5eac-4a49-88ee-d067a700b97c)
 
 
 **Sample output:**
@@ -130,6 +142,7 @@ python OMOP_to_FIPS.py --user xxx --password xxx --server xxx --port xxx --datab
 
 ![image](https://github.com/user-attachments/assets/17d6285d-0491-418b-9e81-03bd19eccfc1)
 
+## Special case
 
 
 ## Step 3: SDOH Linkage Process
