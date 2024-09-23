@@ -13,7 +13,7 @@ So we started the journey and tried to provide a solution for below areas:
 4. A local running toolkits for geocoding
 
 ## Database design 
-We seletced PostgreSQL database and GIS extension to fulfill our requests. Inspired by OHDSI GIS working group, we designed our database with the most fundmental components and tables. As SDoH and environmental datasets are highly involved with geo-information, we ingested the Census Tract, ZCTA, County and States shapefiles into the database and link the variable tables with the geo-tables.
+We seletced PostgreSQL database and GIS extension to fulfill our requests. Inspired by [OHDSI GIS working group](https://github.com/OHDSI/GIS), we designed our database with the most fundmental components and tables. As SDoH and environmental datasets are highly involved with geo-information, we ingested the Census Tract, ZCTA, County and States shapefiles into the database and link the variable tables with the geo-tables.
 
 * `data_source` table is used to store significant metadata from all source datasets includes SDoH datasets, environmental data and geomentry data. 
 
@@ -28,14 +28,25 @@ We seletced PostgreSQL database and GIS extension to fulfill our requests. Inspi
 
 ## Toolkits
 
-To maintain the privacy of patient's address, investigators need to execute the geocoding toolkits locally with the help of DeGauss. 
+Since the most SDoH datasets have the Census Tract(FIPS) as boundary type, the toolkits are developed for investigators to geocode the source address to coordinations or FIPS codes. 
+
+To maintain the privacy of patient's address, investigators need to execute the geocoding toolkits locally with the help of [DeGauss](https://degauss.org). 
 We prepared the scripts for both file processing and fetch data directly from OMOP databases.
 
-[more details]
+> If your institute already provides the geocoding service, please ignore the toolkit.
+
+Detailed execution instructions are recorded at [here](./Tools/SDOH/readme.md)
 
 ## Web Application
 
-[more details]
+We created a web application to provide the investigators with the access to :
+- data catalog
+- SDoH and Env data linkage tool
+- data visuallization tool 
+
+In the next release, we are planning to provide a basic data analyzer tool.
+
+The web application is deployed at [HiPerGator](https://www.rc.ufl.edu/about/hipergator/) PubApps 
 
 ![workflow](./assets/External%20investigator%20workflow.png)
 
