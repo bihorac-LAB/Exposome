@@ -1,5 +1,7 @@
 
-# SDoH and Environmental Database and Toolkits
+# iSEDH
+
+iSEDH is the abbreviation of Intelligent Social and Environmental Determinants of Health
 
 ## Background and Introduction
 
