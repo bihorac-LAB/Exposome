@@ -6,7 +6,7 @@
 This guide outlines the steps required to prepare input data for linking Social Determinants of Health (SDOH) using geographic information. The Census Tract (FIPS 11 code) is the key geographic identifier used to connect data to the SDOH database. Step 1 is used to prepare the information for generating FIPS11 code, and step 2 is to generate FIPS code using toolkit. Users need to prepare only **ONE** of the following data types for each encounter: address, coordinates, or census tract information.
 
 ### Option 1. Address information 
-#### Prepare a CSV file with formatted address data using one of the following acceptable formats:
+#### Prepare a folder to save some CSV files with formatted address data using one of the following acceptable formats:
 #### Format A: Single Column Address
 - **Column**: `address`
 - **Example**:
@@ -28,7 +28,7 @@ This guide outlines the steps required to prepare input data for linking Social 
 **Note**: If you can directly collect latitude, longitude, or FIPS code information for patients, preparing address information is not required.
 
 ### Option 2: Coordinates Information 
-#### Prepare a CSV file with latitude and longitude information for the patients.
+#### Prepare a folder to save some CSV files with latitude and longitude information for the patients.
 - **Columns**: `latitude`, `longitude`
 - **Example**:
 
@@ -40,7 +40,7 @@ This guide outlines the steps required to prepare input data for linking Social 
 
 ### Option 3: Census Tract Information
 
-#### Prepare a CSV file with FIPS code information for the patients.
+####  Prepare a folder to save some CSV files with FIPS code information for the patients.
 - **Column**: `FIPS`
 - **Example**:
 
@@ -64,7 +64,7 @@ This guide outlines the steps required to prepare input data for linking Social 
 
 **Python scripts input:**
 
-- -i：Input file path *(required)*
+- -i：Input folder path *(required)*
 
 - -y：Patient encounter year  *(required)*
 
@@ -78,21 +78,21 @@ This guide outlines the steps required to prepare input data for linking Social 
 
 *option 1:*
 
-python Address_to_FIPS.py -i "./Demo_address.csv" -d year --columns street city state zip
+python Address_to_FIPS.py -i "./folder" -d year --columns street city state zip
 
-![image](https://github.com/user-attachments/assets/882367f2-5f6b-4f0d-91de-c8c5a232d7f9)
+![image](https://github.com/user-attachments/assets/66be07b6-00e1-4ef6-844b-a1a8c27138b6)
 
 
 *option 2:*
 
-python Address_to_FIPS.py -i "./Demo_address.csv" -d year --columns address
+python Address_to_FIPS.py -i "./folder" -d year --columns address
 
 ![image](https://github.com/user-attachments/assets/3c0129da-7ce2-411d-9b6a-ea5d67532fac)
 
 
 *option 3:*
 
-python Address_to_FIPS.py -i "./Demo_address.csv" -d year -lat latitude -long longitude
+python Address_to_FIPS.py -i "./folder" -d year -lat latitude -long longitude
 
 ![image](https://github.com/user-attachments/assets/345fc88a-5eac-4a49-88ee-d067a700b97c)
 
@@ -142,7 +142,7 @@ python OMOP_to_FIPS.py --user xxx --password xxx --server xxx --port xxx --datab
 
 ![image](https://github.com/user-attachments/assets/17d6285d-0491-418b-9e81-03bd19eccfc1)
 
-## Special case
+## Special case (will updating)
 
 
 ## Step 3: SDOH Linkage Process
