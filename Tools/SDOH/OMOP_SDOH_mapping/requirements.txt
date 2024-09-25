@@ -1,3 +1,0 @@
-pyodbc==4.0.34
-pandas==2.0.3
-SQLAlchemy==2.0.31
