@@ -3,7 +3,7 @@
 
 ## Step 1: Preparing Input Data
 
-This guide outlines the steps required to prepare input data for linking Social Determinants of Health (SDOH) using geographic information. The Census Tract (FIPS 11 code) is the key geographic identifier used to connect data to the SDOH database. Step 1 is used to prepare the information for generating FIPS11 code, and step 2 is to generate FIPS code using toolkit. Users need to prepare only **ONE** of the following data types for each encounter: address, coordinates, or census tract information.
+This guide outlines the steps required to prepare input data for linking Social Determinants of Health (SDOH) using geographic information. The Census Tract (FIPS 11 code) is the key geographic identifier used to connect data to the SDOH database. Step 1 is used to prepare the information for generating FIPS11 code, and step 2 is to generate FIPS code using toolkit. Users need to prepare only **ONE** of the following data elements for each encounter: address, coordinates, or census tract information.
 
 ### Option 1. Address information 
 #### Prepare a folder to save some CSV files with formatted address data using one of the following acceptable formats:
@@ -50,7 +50,7 @@ This guide outlines the steps required to prepare input data for linking Social 
 | 12103026400 | 
 
 
-**Note**:  If you already have Census tract information for patients, you can skip preparing coordinate information.
+**Note**:  If you already have Census tract information for encounters, you can skip preparing coordinate information and skip step 2.
 
 ## Step 2: Using Toolkit to Retrieve Census Tract Information
 ### Case 1: csv format
