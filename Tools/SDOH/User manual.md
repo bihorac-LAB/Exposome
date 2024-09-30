@@ -142,7 +142,19 @@ python OMOP_to_FIPS.py --user xxx --password xxx --server xxx --port xxx --datab
 
 ![image](https://github.com/user-attachments/assets/17d6285d-0491-418b-9e81-03bd19eccfc1)
 
-## Special case (will updating)
+## Special case (updating)
+
+We offer two methods to obtain FIPS codes from coordinate data:
+
+| Method | Advantage | Disadvantage |
+|----------|----------|----------|
+| DeGAUSS | More efficient and faster processing. | Limited to 2010 and 2020 FIPS codes, with lower accuracy for other years. |
+| Spatial  Join | Provides FIPS codes for multiple years, offering higher accuracy with more precise, year-specific data. | Requires more processing time due to the complexity of spatial calculations.
+
+
+#### Uploading Files for FIPS Code Generation
+Users can upload their final_coordinates_files.zip on our web page, and we will generate files containing the most accurate FIPS codes based on the chosen method.
+
 
 
 ## Step 3: SDOH Linkage Process
