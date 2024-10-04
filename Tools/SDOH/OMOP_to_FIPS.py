@@ -50,9 +50,9 @@ def omop_extraction(user, password, server, port, database):
                 FROM IC3_INPATIENT_PIPELINE_2024.CDM.PERSON p
                 LEFT JOIN IC3_INPATIENT_PIPELINE_2024.CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
             address AS (
-                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.county, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
+                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
                 FROM LOCATION L LEFT JOIN LOCATION_HISTORY LS ON L.location_id = LS.location_id)
-            SELECT person_id, visit_occurrence_id, visit_start_date, visit_end_date, address_1, city, state, zip, county, latitude, longitude
+            SELECT person_id, visit_occurrence_id, visit_start_date, visit_end_date, address_1, city, state, zip, latitude, longitude
             FROM patient p
             LEFT JOIN address a ON p.person_id = a.entity_id
             WHERE p.visit_start_date BETWEEN a.start_date AND a.end_date
@@ -67,9 +67,9 @@ def omop_extraction(user, password, server, port, database):
                 FROM IC3_INPATIENT_PIPELINE_2024.CDM.PERSON p
                 LEFT JOIN IC3_INPATIENT_PIPELINE_2024.CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
             address AS (
-                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.county, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
+                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
                 FROM LOCATION L LEFT JOIN LOCATION_HISTORY LS ON L.location_id = LS.location_id)
-            SELECT person_id, visit_occurrence_id, visit_start_date, visit_end_date, address_1, city, state, zip, county, latitude, longitude
+            SELECT person_id, visit_occurrence_id, visit_start_date, visit_end_date, address_1, city, state, zip, latitude, longitude
             FROM patient p
             LEFT JOIN address a ON p.person_id = a.entity_id
             WHERE p.visit_start_date BETWEEN a.start_date AND a.end_date
@@ -85,9 +85,9 @@ def omop_extraction(user, password, server, port, database):
                 FROM IC3_INPATIENT_PIPELINE_2024.CDM.PERSON p
                 LEFT JOIN IC3_INPATIENT_PIPELINE_2024.CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
             address AS (
-                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.county, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
+                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
                 FROM LOCATION L LEFT JOIN LOCATION_HISTORY LS ON L.location_id = LS.location_id)
-            SELECT person_id, visit_occurrence_id, visit_start_date, visit_end_date, address_1, city, state, zip, county, latitude, longitude
+            SELECT person_id, visit_occurrence_id, visit_start_date, visit_end_date, address_1, city, state, zip, latitude, longitude
             FROM patient p
             LEFT JOIN address a ON p.person_id = a.entity_id
             WHERE p.visit_start_date BETWEEN a.start_date AND a.end_date
