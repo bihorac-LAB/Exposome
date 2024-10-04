@@ -240,7 +240,7 @@ def main():
     parser = argparse.ArgumentParser(description='FIPS Geocoding')
     parser.add_argument('-i', '--input', type=str, required=True, help='Input folder path containing CSV files')
     parser.add_argument('--debug', dest='debug', action='store_true', help='Enable debug logging')
-    parser.add_argument('-d', '--year', type=str, required=True, help='Year column name')
+    parser.add_argument('-y', '--year', type=str, required=True, help='Year column name')
     #(if you have separate columns for address please input in this order: street, city, state, zip. If you just have one column fro address, just input the address column name, eg:address)
     parser.add_argument('--columns', nargs='+', help='Column names for address(if you have separate columns for address please input in this order: street, city, state, zip. If you just have one column fro address, just input the address column name, eg:address)')
     parser.add_argument('-lat', type=str, help='Latitude column name')
