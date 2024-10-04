@@ -78,40 +78,44 @@ This guide outlines the steps required to prepare input data for linking Social 
 
 *option 1:*
 
-python Address_to_FIPS.py -i "./folder" -d year --columns street city state zip
+python Address_to_FIPS.py -i "./folder" -y year --columns street city state zip
 
-![image](https://github.com/user-attachments/assets/66be07b6-00e1-4ef6-844b-a1a8c27138b6)
+![image](https://github.com/user-attachments/assets/7758e7ef-9e30-417a-aefc-2e8703d519a2)
+
 
 
 *option 2:*
 
-python Address_to_FIPS.py -i "./folder" -d year --columns address
+python Address_to_FIPS.py -i "./folder" -y year --columns address
 
-![image](https://github.com/user-attachments/assets/3c0129da-7ce2-411d-9b6a-ea5d67532fac)
+![image](https://github.com/user-attachments/assets/4f5c94dd-bc64-499c-b10b-9c8875298169)
+
 
 
 *option 3:*
 
-python Address_to_FIPS.py -i "./folder" -d year -lat latitude -long longitude
+python Address_to_FIPS.py -i "./folder" -y year -lat latitude -long longitude
 
-![image](https://github.com/user-attachments/assets/345fc88a-5eac-4a49-88ee-d067a700b97c)
+![image](https://github.com/user-attachments/assets/6d83742a-efee-427a-969c-ca73afa1ab36)
+
 
 
 **Sample output:**
 
 *option 1:*
 
-![image](https://github.com/user-attachments/assets/58a055d5-d634-4d99-bac1-b3a6dd1db140)
+![image](https://github.com/user-attachments/assets/e0fd0970-dd3b-43f6-97a4-b593b71c24fb)
 
 
 *option 2:*
 
-![image](https://github.com/user-attachments/assets/caea7ea3-bf40-46f2-8565-3689bcc24620)
+![image](https://github.com/user-attachments/assets/e0fd0970-dd3b-43f6-97a4-b593b71c24fb)
 
 
 *option 3:*
 
-![image](https://github.com/user-attachments/assets/bbd9e960-ffdb-4c19-aa1e-fe929e8a3221)
+![image](https://github.com/user-attachments/assets/cc88a140-ce5e-4553-9f29-35e36b571b55)
+
 
 
 ### Case 2: OMOP format
@@ -140,7 +144,8 @@ python OMOP_to_FIPS.py --user xxx --password xxx --server xxx --port xxx --datab
 
 **Sample output:**
 
-![image](https://github.com/user-attachments/assets/17d6285d-0491-418b-9e81-03bd19eccfc1)
+![image](https://github.com/user-attachments/assets/525ecf22-c50e-4c1a-97b7-adde416b18d3)
+
 
 ## Special case (updating)
 
@@ -162,7 +167,7 @@ Users can upload their final_coordinates_files.zip on our web page, and we will 
 ### Getting Started
 1. **Sign Up**: Begin by navigating to the [registration page](#) to create an account. Follow the on-screen instructions to complete the sign-up process.
 
-2. **Upload Your CSV File**: Once registered, you can upload your prepared CSV file. Ensure that your file adheres to the required format listed below.
+2. **Upload Your CSV File**: Once registered, you can upload the result zip file(e.g. output_with_fips.zip) if you follow the step 1&2. If you
 
 ### Required CSV File Format
 Prepare your CSV file to include the following columns:
@@ -173,13 +178,13 @@ Prepare your CSV file to include the following columns:
 
 **Example input**:
 
-![image](https://github.com/user-attachments/assets/9e56aa19-7406-400a-9064-51852be48f37)
+![image](https://github.com/user-attachments/assets/95b15319-fec2-459c-a079-3ea41813fe96)
+
 
 
 **Example output**:
 
-![image](https://github.com/user-attachments/assets/39c02650-151b-4577-aa8f-38f8800bb223)
-
+![image](https://github.com/user-attachments/assets/ca76eedd-e5ce-4506-9093-aba1f69dbf75)
 
 
 
