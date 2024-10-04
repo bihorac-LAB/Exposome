@@ -253,24 +253,24 @@ def main():
 
     final_output_files = []  # Collect all final output files for zipping
 
-   # Step 1: Use ThreadPoolExecutor to process up to 10 files concurrently
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        futures = {executor.submit(process_csv_file, file, input_folder, args): file for file in csv_files}
+    # Step 1: Use ThreadPoolExecutor to process up to 10 files concurrently
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        futures = {executor.submit(process_csv_file, file, input_folder, args, final_coordinate_files): file for file in csv_files}
 
         for future in concurrent.futures.as_completed(futures):
             file = futures[future]
             try:
                 result = future.result()
                 if result:
-                    final_output_files.append(result)
+                    final_fips_files.append(result)
             except Exception as e:
                 logger.error(f"Error processing file {file}: {e}")
 
     # Step 2: Package all final output files into a zip
-    zip_filename = os.path.join(input_folder, "final_output_files.zip")
+    zip_filename = os.path.join(input_folder, "final_fips_files.zip")
     
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
-        for final_file in final_output_files:
+        for final_file in final_fips_files:
             if os.path.exists(final_file):  # Only include files that exist
                 zipf.write(final_file, os.path.basename(final_file))  # Add the file to the zip archive
             else:
@@ -278,6 +278,31 @@ def main():
 
     logger.info(f"All output files zipped into: {zip_filename}")
 
+    # Step 3: Package all final coordinate files into a zip
+    if final_coordinate_files:  # Check if the list is not empty
+        zip_coordinates_filename = os.path.join(input_folder, "final_coordinates_files.zip")
+    
+        with zipfile.ZipFile(zip_coordinates_filename, 'w') as zipf:
+            for coord_file in final_coordinate_files:
+                if os.path.exists(coord_file):  # Only include files that exist
+                    zipf.write(coord_file, os.path.basename(coord_file))  # Add the file to the zip archive
+                else:
+                    logger.error(f"Skipping missing file: {coord_file}")
+
+        logger.info(f"All coordinate output files zipped into: {zip_coordinates_filename}")
+    else:
+        logger.warning("No coordinate files to zip. Skipping the creation of final_coordinates_files.zip.")
+        
+    # Step 4: Remove all the subdirectories, but keep the zip files
+    logger.info("Cleaning up subdirectories...")
+    for root, dirs, files in os.walk(input_folder, topdown=False):
+        for dir_name in dirs:
+            dir_path = os.path.join(root, dir_name)
+            if os.path.isdir(dir_path):
+                shutil.rmtree(dir_path)
+                logger.info(f"Deleted directory: {dir_path}")
+
+    logger.info("Cleanup completed. Only zip files remain in the input folder.")
 
 if __name__ == "__main__":
     main()
