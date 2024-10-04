@@ -52,8 +52,24 @@ This guide outlines the steps required to prepare input data for linking Social 
 
 **Note**:  If you already have Census tract information for encounters, you can skip preparing coordinate information and skip step 2.
 
-## Step 2: Using Toolkit to Retrieve Census Tract Information
-### Case 1: csv format
+## Step 2: Get Census Tract Information
+
+We provide two methods to retrieve FIPS codes from coordinate data:
+
+- DeGAUSS Toolkit (Local Execution): Run the DeGAUSS Python toolkit locally for efficient FIPS code extraction.
+- Spatial Join (Web-based Tool): Perform spatial joins via our web page, leveraging a backend database to process and return FIPS codes. Users can download the resulting FIPS file upon completion.
+
+| Method | Advantage | Disadvantage |
+|----------|----------|----------|
+| DeGAUSS | Faster and more efficient processing. | Limited to 2010 year and 2020 year FIPS codes; accuracy may be lower for other years. |
+| Spatial  Join | Provides year-specific FIPS codes, delivering higher accuracy with precise data for multiple years. | Requires longer processing times due to the complexity of spatial calculations.|
+
+For year-specific accuracy, we recommend using the Spatial Join method.
+
+### DeGAUSS Method
+The DeGAUSS method offers two distinct approaches based on the data source. One method is tailored for CSV file inputs (Case 1), while the other is optimized for OMOP database integration (Case 2).
+
+#### Case 1: csv format
 
 ![image](https://github.com/user-attachments/assets/a1c5b366-dd78-4173-8ae7-33537e2a1bbc)
 
@@ -74,7 +90,7 @@ This guide outlines the steps required to prepare input data for linking Social 
 
 - -long: Longitude column name *(optional)*
 
-**Example usage:**
+**Usage example:**
 
 *option 1:*
 
@@ -82,15 +98,11 @@ python Address_to_FIPS.py -i "./folder" -y year --columns street city state zip
 
 ![image](https://github.com/user-attachments/assets/7758e7ef-9e30-417a-aefc-2e8703d519a2)
 
-
-
 *option 2:*
 
 python Address_to_FIPS.py -i "./folder" -y year --columns address
 
 ![image](https://github.com/user-attachments/assets/4f5c94dd-bc64-499c-b10b-9c8875298169)
-
-
 
 *option 3:*
 
@@ -98,27 +110,21 @@ python Address_to_FIPS.py -i "./folder" -y year -lat latitude -long longitude
 
 ![image](https://github.com/user-attachments/assets/6d83742a-efee-427a-969c-ca73afa1ab36)
 
-
-
-**Sample output:**
+**Output example:**
 
 *option 1:*
 
 ![image](https://github.com/user-attachments/assets/e0fd0970-dd3b-43f6-97a4-b593b71c24fb)
 
-
 *option 2:*
 
 ![image](https://github.com/user-attachments/assets/e0fd0970-dd3b-43f6-97a4-b593b71c24fb)
-
 
 *option 3:*
 
 ![image](https://github.com/user-attachments/assets/cc88a140-ce5e-4553-9f29-35e36b571b55)
 
-
-
-### Case 2: OMOP format
+#### Case 2: OMOP format
 
 ![image](https://github.com/user-attachments/assets/79eacedc-e047-4e92-8b80-a67502c4b4e3)
 
@@ -138,24 +144,16 @@ python Address_to_FIPS.py -i "./folder" -y year -lat latitude -long longitude
 - `port`: port number
 - `database`: database name for OMOP
 
-**Example usage:**
+**Usage example:**
 
 python OMOP_to_FIPS.py --user xxx --password xxx --server xxx --port xxx --database xxx
 
-**Sample output:**
+**Output example:**
 
 ![image](https://github.com/user-attachments/assets/525ecf22-c50e-4c1a-97b7-adde416b18d3)
 
 
-## Special case (updating)
-
-We offer two methods to obtain FIPS codes from coordinate data:
-
-| Method | Advantage | Disadvantage |
-|----------|----------|----------|
-| DeGAUSS | More efficient and faster processing. | Limited to 2010 and 2020 FIPS codes, with lower accuracy for other years. |
-| Spatial  Join | Provides FIPS codes for multiple years, offering higher accuracy with more precise, year-specific data. | Requires more processing time due to the complexity of spatial calculations.
-
+### Spatial Join Method (updating)
 
 #### Uploading Files for FIPS Code Generation
 Users can upload their final_coordinates_files.zip on our web page, and we will generate files containing the most accurate FIPS codes based on the chosen method.
@@ -167,7 +165,7 @@ Users can upload their final_coordinates_files.zip on our web page, and we will 
 ### Getting Started
 1. **Sign Up**: Begin by navigating to the [registration page](#) to create an account. Follow the on-screen instructions to complete the sign-up process.
 
-2. **Upload Your CSV File**: Once registered, you can upload the result zip file(e.g. output_with_fips.zip) if you follow the step 1&2. If you
+2. **Upload Your CSV File**: Once registered, you can upload the result zip file(e.g. output_with_fips.zip) if you follow the step 1&2. If you already have your fips file by yourself
 
 ### Required CSV File Format
 Prepare your CSV file to include the following columns:
@@ -176,13 +174,13 @@ Prepare your CSV file to include the following columns:
 - `year`
 - `FIPS`
 
-**Example input**:
+**Input example**:
 
 ![image](https://github.com/user-attachments/assets/95b15319-fec2-459c-a079-3ea41813fe96)
 
 
 
-**Example output**:
+**Output example:**
 
 ![image](https://github.com/user-attachments/assets/ca76eedd-e5ce-4506-9093-aba1f69dbf75)
 
