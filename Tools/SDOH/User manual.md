@@ -82,7 +82,7 @@ The DeGAUSS method offers two distinct approaches based on the data source. One 
 
 - -i：Input folder path *(required)*
 
-- -y：Patient encounter year  *(required)*
+- -y：The column name for patient encounter year  *(required)*
 
 - --columns: Column names for address(if you have separate columns for address please input in this order: street, city, state, zip. If you just have one column for address, input the address column name, eg:address)  *(optional)*
 
