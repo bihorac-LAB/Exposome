@@ -128,6 +128,8 @@ python Address_to_FIPS.py -i "./folder" -y year -lat latitude -long longitude
 
 ![image](https://github.com/user-attachments/assets/79eacedc-e047-4e92-8b80-a67502c4b4e3)
 
+The scripts extract the required infomation form OMOP database to Linkage data and then convert the address or latitude, longitude to FIPS code.
+
  **Required Tables and Columns for OMOP Database**:
 
 | Table_name | Required_column_name |
@@ -149,6 +151,21 @@ python Address_to_FIPS.py -i "./folder" -y year -lat latitude -long longitude
 python OMOP_to_FIPS.py --user xxx --password xxx --server xxx --port xxx --database xxx
 
 **Output example:**
+```plaintext
+├── Linkage_data/
+│   ├── valid_address/        # Saved all patient encounter information with address
+│   ├── invalid_lat_lon_address/        #  Saved all patient encounter information without address or latitude, longitude
+│   └── valid_lat_long/     # Saved all patient encounter information without latitude and longitude
+
+├── Linkage_result/
+│   ├── address/        # Saved the output result from valid_address folder
+|   |   ├──address_with_coordinates.zip   # Addresses with geographic coordinates
+│   │   └── address_with_fips.zip         # Addresses with FIPS codes
+│   ├── invalid/        #  Empty fodler (files in invalid_lat_lon_address do not meet the requirments for converting the FIPS code)
+│   └── latlong/        # Saved the output result from valid_lat_long folder
+|       └──latlong_with_fips.zip   # Latlong with valid_lat_long
+
+```
 
 ![image](https://github.com/user-attachments/assets/525ecf22-c50e-4c1a-97b7-adde416b18d3)
 
