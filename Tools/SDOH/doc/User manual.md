@@ -7,16 +7,7 @@ This guide outlines the steps required to prepare input data for linking Social 
 
 ### Option 1. Address information 
 #### Prepare a folder to save some CSV files with formatted address data using one of the following acceptable formats:
-#### Format A: Single Column Address
-- **Column**: `address`
-- **Example**:
-   
-| address |
-|----------|
-| 1250 W 16Th St Jacksonville Fl 32209 |
-|2001 Sw 16Th St Gainesville Fl 32608 | 
-
-#### Format B: Multi-Column Address
+#### Format A: Multi-Column Address
 - **Columns**: `street`, `city`, `state`, `zip`
 - **Example**:
    
@@ -24,6 +15,15 @@ This guide outlines the steps required to prepare input data for linking Social 
 |----------|----------|----------|----------|
 | 1250 W 16th St | Jacksonville | FL | 32209 |
 | 2001 SW 16th St | Gainesville | FL | 32608 |
+
+#### Format B: Single Column Address
+- **Column**: `address`
+- **Example**:
+   
+| address |
+|----------|
+| 1250 W 16Th St Jacksonville Fl 32209 |
+|2001 Sw 16Th St Gainesville Fl 32608 | 
 
 **Note**: If you can directly collect latitude, longitude, or FIPS code information for patients, preparing address information is not required.
 
@@ -75,54 +75,43 @@ The DeGAUSS method offers two distinct approaches based on the data source. One 
 
  **Input CSV File Should Contain**:
 - Patient encounter ID (e.g., 12345)
-- Patient encounter year (e.g., 2024)
+- Patient encounter year, the column name should called **year** (e.g., 2024)
 - Address or coordinates information (refer to Step 1 for details)
 
 **Python scripts input:**
 
 - -i：Input folder path *(required)*
 
-- -y：The column name for patient encounter year  *(required)*
-
-- --columns: Column names for address(if you have separate columns for address please input in this order: street, city, state, zip. If you just have one column for address, input the address column name, eg:address)  *(optional)*
-
-- -lat: Latitude column name *(optional)*
-
-- -long: Longitude column name *(optional)*
-
+- -o: options for three different types of input, choices=[1, 2, 3]
+      1 = street, city, state, zip; 2 = address; 3 = latitude, longitude'  *(required)*
 **Usage example:**
 
-*option 1:*
+*option 1:* 
+If your prepared data in option 1 format A in step 1, you can input below:
 
-python Address_to_FIPS.py -i "./folder" -y year --columns street city state zip
+python Address_to_FIPS.py -i ./folder -o 1
 
 ![image](https://github.com/user-attachments/assets/7758e7ef-9e30-417a-aefc-2e8703d519a2)
 
 *option 2:*
+If your prepared data in option 1 format B in step 1, you can input below:
 
-python Address_to_FIPS.py -i "./folder" -y year --columns address
+python Address_to_FIPS.py -i ./folder -o 2
 
 ![image](https://github.com/user-attachments/assets/4f5c94dd-bc64-499c-b10b-9c8875298169)
 
 *option 3:*
+If your prepared data in option 2 in step 1, you can input below:
 
-python Address_to_FIPS.py -i "./folder" -y year -lat latitude -long longitude
+python Address_to_FIPS.py -i ./folder -o 3
 
 ![image](https://github.com/user-attachments/assets/6d83742a-efee-427a-969c-ca73afa1ab36)
 
 **Output example:**
 
-*option 1:*
+Three options input have same output format.
 
-![image](https://github.com/user-attachments/assets/e0fd0970-dd3b-43f6-97a4-b593b71c24fb)
-
-*option 2:*
-
-![image](https://github.com/user-attachments/assets/e0fd0970-dd3b-43f6-97a4-b593b71c24fb)
-
-*option 3:*
-
-![image](https://github.com/user-attachments/assets/cc88a140-ce5e-4553-9f29-35e36b571b55)
+![image](https://github.com/user-attachments/assets/489d8cf4-cc02-4864-a7ff-fefb26167a86)
 
 #### Case 2: OMOP format
 
