@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 import concurrent.futures
 import zipfile
 import shutil
+from datetime import datetime
 
 
 logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="INFO")
@@ -110,7 +111,7 @@ def generate_fips_degauss(df, year, output_folder):
     
     preprocessed_file_path = os.path.join(output_folder, 'preprocessed_2.csv')
     # Columns that may exist and need to be dropped
-    columns_to_drop = {'matched_street', 'matched_zip', 'matched_city', 'matched_state', 'score', 'precision', 'geocode_result'}
+    columns_to_drop = {'matched_street', 'matched_zip', 'matched_city', 'matched_state', 'score', 'precision', 'geocode_result', 'address'}
     # Drop only the columns that exist in the DataFrame
     columns_in_df = set(df.columns)  # Get the columns that exist in the DataFrame
     columns_to_drop = columns_to_drop.intersection(columns_in_df)  # Find intersection of existing columns and columns to drop
@@ -161,27 +162,38 @@ def process_csv_file(file, input_folder, args, final_coordinate_files):
     logger.info(f"Processing file: {file_path}")
 
     # Step 1: Check if latitude and longitude are provided (skip geocode if present)
-    if args.lat and args.long:
+    if args.option == 3:
         logger.info("Using provided latitude and longitude columns, skipping geocoding.")
         df = pd.read_csv(file_path)
-        df.rename(columns={args.lat: 'lat', args.long: 'lon'}, inplace=True)
-        df['year_for_fips'] = df[args.year].apply(lambda x: 2010 if x < 2020 else 2020)
+        df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
+        df['year_for_fips'] = df['year'].apply(lambda x: 2010 if x < 2020 else 2020)
 
     # Step 2: If latitude and longitude are not provided, check for address columns
-    elif args.columns:
+    elif args.option in [1, 2]:
         logger.info("Latitude and longitude not provided. Using address columns for geocoding.")
         threshold = 0.7
+
+        # Set the columns based on the option
+        if args.option == 1:
+            columns = ['street', 'city', 'state', 'zip']
+        elif args.option == 2:
+            columns = ['address']
+
         df = pd.read_csv(file_path)
-        geocoded_file = generate_coordinates_degauss(df, args.columns, threshold, output_folder)
+        geocoded_file = generate_coordinates_degauss(df, columns, threshold, output_folder)
         logger.info(f"Geocoded file created: {geocoded_file}")
 
         # Load geocoded file after processing
         df = pd.read_csv(geocoded_file)
-        df['year_for_fips'] = df[args.year].apply(lambda x: 2010 if x < 2020 else 2020)
+        df['year_for_fips'] = df['year'].apply(lambda x: 2010 if x < 2020 else 2020)
+
+         # Rename columns and drop unnecessary ones
         latlon = pd.read_csv(geocoded_file)
-        columns_to_drop = ['matched_street', 'matched_zip', 'matched_city', 'matched_state', 'score', 'precision', 'geocode_result']
+        columns_to_drop = ['matched_street', 'matched_zip', 'matched_city', 'matched_state', 'score', 'precision', 'geocode_result', 'address']
         latlon.drop(columns=[col for col in columns_to_drop if col in latlon.columns], inplace=True)
         latlon.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
+        
+        # Save the file with coordinates
         base_filename = os.path.splitext(file)[0]
         output_file = os.path.join(output_folder, f"{base_filename}_with_coordinates.csv")
         latlon.to_csv(output_file, index=False)
@@ -253,13 +265,27 @@ def main():
     parser = argparse.ArgumentParser(description='FIPS Geocoding')
     parser.add_argument('-i', '--input', type=str, required=True, help='Input folder path containing CSV files')
     parser.add_argument('--debug', dest='debug', action='store_true', help='Enable debug logging')
-    parser.add_argument('-y', '--year', type=str, required=True, help='Year column name')
-    #(if you have separate columns for address please input in this order: street, city, state, zip. If you just have one column fro address, just input the address column name, eg:address)
-    parser.add_argument('--columns', nargs='+', help='Column names for address(if you have separate columns for address please input in this order: street, city, state, zip. If you just have one column fro address, just input the address column name, eg:address)')
-    parser.add_argument('-lat', type=str, help='Latitude column name')
-    parser.add_argument('-long', type=str, help='Longitude column name')
+    parser.add_argument('-o', '--option', type=int, choices=[1, 2, 3], required=True, 
+                        help='Option for input type: 1 = street, city, state, zip; 2 = address; 3 = latitude, longitude')
     
     args = parser.parse_args()
+
+    # Generate timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+
+     # Handle each option case
+    if args.option == 1:
+        columns = ['street', 'city', 'state', 'zip']
+        logger.info(f"Option 1 selected: street={columns[0]}, city={columns[1]}, state={columns[2]}, zip={columns[3]}")
+
+    elif args.option == 2:
+        columns = ['address']
+        logger.info(f"Option 2 selected: address={columns[0]}")
+
+    elif args.option == 3:
+        latitude = 'latitude'
+        longitude = 'longitude'
+        logger.info(f"Option 3 selected: latitude={latitude}, longitude={longitude}")
 
     input_folder = args.input
     csv_files = [f for f in os.listdir(input_folder) if f.endswith('.csv')]
@@ -281,7 +307,12 @@ def main():
                 logger.error(f"Error processing file {file}: {e}")
 
     # Step 2: Package all final output files into a zip
-    zip_filename = os.path.join(input_folder, "final_fips_files.zip")
+    #Create the 'output' folder parallel to the input folder
+    parent_folder = os.path.dirname(input_folder)
+    output_folder = os.path.join(parent_folder, "output")
+    os.makedirs(output_folder, exist_ok=True)
+
+    zip_filename = os.path.join(output_folder, f"geocoded_fips_codes_{timestamp}.zip")
     
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
         for final_file in final_fips_files:
@@ -294,7 +325,7 @@ def main():
 
     # Step 3: Package all final coordinate files into a zip
     if final_coordinate_files:  # Check if the list is not empty
-        zip_coordinates_filename = os.path.join(input_folder, "final_coordinates_files.zip")
+        zip_coordinates_filename = os.path.join(output_folder, f"coordinates_from_address_{timestamp}.zip")
     
         with zipfile.ZipFile(zip_coordinates_filename, 'w') as zipf:
             for coord_file in final_coordinate_files:
@@ -305,7 +336,7 @@ def main():
 
         logger.info(f"All coordinate output files zipped into: {zip_coordinates_filename}")
     else:
-        logger.warning("No coordinate files to zip. Skipping the creation of final_coordinates_files.zip.")
+        logger.warning("No coordinate files to zip. Skipping the creation of coordinates_from_address.zip.")
         
     # Step 4: Remove all the subdirectories, but keep the zip files
     logger.info("Cleaning up subdirectories...")
@@ -322,6 +353,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+                
+    
+    
                 
     
     
