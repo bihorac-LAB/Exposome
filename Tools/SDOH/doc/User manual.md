@@ -84,6 +84,7 @@ The DeGAUSS method offers two distinct approaches based on the data source. One 
 
 - -o: options for three different types of input, choices=[1, 2, 3]
       1 = street, city, state, zip; 2 = address; 3 = latitude, longitude'  *(required)*
+  
 **Usage example:**
 
 *option 1:* 
