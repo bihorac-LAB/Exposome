@@ -11,7 +11,27 @@ import shutil
 from datetime import datetime
 
 
-logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="INFO")
+# logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="INFO")
+#get the log file
+def configure_logging(output_folder):
+    # Create log subfolder inside the output folder
+    log_folder = os.path.join(output_folder, "log")
+    os.makedirs(log_folder, exist_ok=True)
+
+    # Create log filename based on current timestamp
+    log_filename = f"address_to_fips_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    log_file_path = os.path.join(log_folder, log_filename)
+
+    # Ensure the output folder exists
+    os.makedirs(output_folder, exist_ok=True)
+    logger.remove()  # Remove any previous handlers (reset the logger)
+
+    # Configure logger to output to both the console and the log file
+    logger.add(sys.stderr, format="{time} {level} {message}", level="DEBUG")  # Logs everything to terminal
+    logger.add(log_file_path, format="{time} {level} {message}", level="DEBUG")  # Logs everything to file
+    logger.info(f"Log file configured: {log_file_path}")
+
+    return log_file_path  # Return the log file path for reference if needed
 
 #Generate latitude and longitude from address infomation
 def generate_coordinates_degauss(df, columns, threshold, output_folder):
@@ -269,9 +289,15 @@ def main():
                         help='Option for input type: 1 = street, city, state, zip; 2 = address; 3 = latitude, longitude')
     
     args = parser.parse_args()
+    input_folder = args.input
+    parent_folder = os.path.dirname(input_folder)
+    output_folder = os.path.join(parent_folder, "output")
+
+    #Configure logging to write to the output folder
+    configure_logging(output_folder)
 
     # Generate timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
      # Handle each option case
     if args.option == 1:
@@ -287,14 +313,14 @@ def main():
         longitude = 'longitude'
         logger.info(f"Option 3 selected: latitude={latitude}, longitude={longitude}")
 
-    input_folder = args.input
+    
     csv_files = [f for f in os.listdir(input_folder) if f.endswith('.csv')]
 
     final_fips_files = []  # Collect all final fips files for zipping
     final_coordinate_files = []  # Collect all final coordinate files for zipping
 
    # Step 1: Use ThreadPoolExecutor to process up to 10 files concurrently
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         futures = {executor.submit(process_csv_file, file, input_folder, args, final_coordinate_files): file for file in csv_files}
 
         for future in concurrent.futures.as_completed(futures):
@@ -308,8 +334,7 @@ def main():
 
     # Step 2: Package all final output files into a zip
     #Create the 'output' folder parallel to the input folder
-    parent_folder = os.path.dirname(input_folder)
-    output_folder = os.path.join(parent_folder, "output")
+    
     os.makedirs(output_folder, exist_ok=True)
 
     zip_filename = os.path.join(output_folder, f"geocoded_fips_codes_{timestamp}.zip")
@@ -347,15 +372,12 @@ def main():
                 shutil.rmtree(dir_path)
                 logger.info(f"Deleted directory: {dir_path}")
 
-    logger.info("Cleanup completed. Only zip files remain in the input folder.")
+    logger.info("Cleanup completed. Only zip files and log file remain in the input folder.")
 
 
 
 if __name__ == "__main__":
     main()
-                
-    
-    
                 
     
     
