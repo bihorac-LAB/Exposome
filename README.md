@@ -37,7 +37,7 @@ We prepared the scripts for both file processing and fetch data directly from OM
 
 > If your institute already provides the geocoding service, please ignore the toolkit.
 
-Detailed execution instructions are recorded at [here](./Tools/SDOH/User%20manual.md) 
+Detailed execution instructions are recorded at [here]([./Tools/SDOH/User%20manual.md](https://github.com/Prisma-pResearch/iSEDH/blob/main/Tools/SDOH/doc/User%20manual.md)) 
 
 ## Web Application
 
