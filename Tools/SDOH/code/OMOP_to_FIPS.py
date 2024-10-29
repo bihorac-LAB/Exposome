@@ -1,4 +1,3 @@
-import pyodbc
 import pandas as pd
 import os
 import shutil
@@ -7,19 +6,52 @@ import sys
 import argparse
 from loguru import logger
 from sqlalchemy import create_engine
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import concurrent
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import zipfile
+from datetime import datetime
+
+# Set the base directory for output, parallel to the code folder
+timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+base_output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), f'../output_{timestamp}'))
+linkage_data_dir = os.path.join(base_output_dir, 'linkage_data')
+linkage_result_dir = os.path.join(base_output_dir, 'linkage_result')
+
+# Create the Linkage_result directory if it doesn't exist
+os.makedirs(linkage_result_dir, exist_ok=True)
+
+# Create a timestamped log filename
+log_filename = f"OMOP_to_FIPS_{timestamp}.log"
+log_file_path = os.path.join(linkage_result_dir, log_filename)
+
+# Set up the logger to write to the log file
+logger.add(log_file_path, format="{time} {level} {message}", level="INFO")
+logger.info(f"Logging started. Log file created at: {log_file_path}")
 
 logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="INFO")
 
+#extract required info from OMOP database
 def omop_extraction(user, password, server, port, database):
     """
     Executes three SQL queries in parallel to categorize data based on the validity of latitude, longitude, and address_1.
     Each query's results are saved in different directories in batches of 100000 rows per CSV.
+    user (str): Database username
+        password (str): Database password
+        server (str): Database server address
+        port (int): Port number for the database
+        database (str): Database name
+    
+    Directories will be created:
+        - './Linkage_data/valid_lat_long'
+        - './Linkage_data/invalid_lat_lon_address'
+        - './Linkage_data/valid_address'
     """
-    conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server},{port};DATABASE={database};UID={user};PWD={password}'
-    base_directory = './Linkage_data'
+
+    # Fetch credentials from environment variables
+    conn_str = f"mssql+pyodbc://{user}:{password}@{server}:{port}/{database}?driver=ODBC+Driver+17+for+SQL+Server"
+    print(conn_str)
+    engine = create_engine(conn_str)
+    # base_directory = './Linkage_data'
     categories = {
         'Latlong': 'valid_lat_long',
         'Invalid': 'invalid_lat_lon_address',
@@ -28,19 +60,19 @@ def omop_extraction(user, password, server, port, database):
 
     # Create directories
     for category in categories.values():
-        os.makedirs(os.path.join(base_directory, category), exist_ok=True)
+        os.makedirs(os.path.join(linkage_data_dir, category), exist_ok=True)
 
     # SQL Queries for each category
     queries = {
         'Latlong': """
             WITH patient AS (
                 SELECT p.person_id, v.visit_occurrence_id, v.visit_start_date, v.visit_end_date
-                FROM IC3_INPATIENT_PIPELINE_2024.CDM.PERSON p
-                LEFT JOIN IC3_INPATIENT_PIPELINE_2024.CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
+                FROM CDM.PERSON p
+                LEFT JOIN CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
             address AS (
-                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.county, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
-                FROM LOCATION L LEFT JOIN LOCATION_HISTORY LS ON L.location_id = LS.location_id)
-            SELECT person_id, visit_occurrence_id, visit_start_date, visit_end_date, address_1, city, state, zip, county, latitude, longitude
+                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
+                FROM CDM.LOCATION L LEFT JOIN CDM.LOCATION_HISTORY LS ON L.location_id = LS.location_id)
+            SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address_1, city, state, zip, latitude, longitude
             FROM patient p
             LEFT JOIN address a ON p.person_id = a.entity_id
             WHERE p.visit_start_date BETWEEN a.start_date AND a.end_date
@@ -51,13 +83,13 @@ def omop_extraction(user, password, server, port, database):
         
         'Invalid': """
             WITH patient AS (
-                SELECT p.person_id, v.visit_occurrence_id, v.visit_start_date, v.visit_end_date
-                FROM IC3_INPATIENT_PIPELINE_2024.CDM.PERSON p
-                LEFT JOIN IC3_INPATIENT_PIPELINE_2024.CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
+                SELECT p.person_id, v.visit_occurrence_id, YEAR(v.visit_start_date) AS year
+                FROM CDM.PERSON p
+                LEFT JOIN CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
             address AS (
-                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.county, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
-                FROM LOCATION L LEFT JOIN LOCATION_HISTORY LS ON L.location_id = LS.location_id)
-            SELECT person_id, visit_occurrence_id, visit_start_date, visit_end_date, address_1, city, state, zip, county, latitude, longitude
+                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
+                FROM CDM.LOCATION L LEFT JOIN CDM.LOCATION_HISTORY LS ON L.location_id = LS.location_id)
+            SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address_1, city, state, zip, latitude, longitude
             FROM patient p
             LEFT JOIN address a ON p.person_id = a.entity_id
             WHERE p.visit_start_date BETWEEN a.start_date AND a.end_date
@@ -69,13 +101,13 @@ def omop_extraction(user, password, server, port, database):
 
         'Address': """
             WITH patient AS (
-                SELECT p.person_id, v.visit_occurrence_id, v.visit_start_date, v.visit_end_date
-                FROM IC3_INPATIENT_PIPELINE_2024.CDM.PERSON p
-                LEFT JOIN IC3_INPATIENT_PIPELINE_2024.CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
+                SELECT p.person_id, v.visit_occurrence_id, YEAR(v.visit_start_date) AS year
+                FROM CDM.PERSON p
+                LEFT JOIN CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
             address AS (
-                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.county, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
-                FROM LOCATION L LEFT JOIN LOCATION_HISTORY LS ON L.location_id = LS.location_id)
-            SELECT person_id, visit_occurrence_id, visit_start_date, visit_end_date, address_1, city, state, zip, county, latitude, longitude
+                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
+                FROM CDM.LOCATION L LEFT JOIN CDM.LOCATION_HISTORY LS ON L.location_id = LS.location_id)
+            SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address_1, city, state, zip, latitude, longitude
             FROM patient p
             LEFT JOIN address a ON p.person_id = a.entity_id
             WHERE p.visit_start_date BETWEEN a.start_date AND a.end_date
@@ -88,27 +120,43 @@ def omop_extraction(user, password, server, port, database):
 
     # Function to fetch and save data
     def fetch_and_save(category, query):
-        filename_template = os.path.join(base_directory, categories[category], f"{category}_{{}}.csv")
-        with pyodbc.connect(conn_str) as conn:
-            offset = 0
-            batch_number = 1
+        print(f"Starting data extraction for category: {category}")
+        filename_template = os.path.join(linkage_data_dir, categories[category], f"{category}_{{}}.csv")
+        offset = 0
+        batch_number = 1
+        with engine.connect() as conn:
             while batch_number <= 2: #True: #testing
-                batch_query = f"{query} ORDER BY person_id, visit_start_date OFFSET {offset} ROWS FETCH NEXT 1000 ROWS ONLY"
+                print(f"Fetching batch {batch_number} for category {category} with offset {offset}")
+                batch_query = f"{query} ORDER BY person_id, visit_start_date OFFSET {offset} ROWS FETCH NEXT 100000 ROWS ONLY"
                 df = pd.read_sql(batch_query, conn)
+                print(f"Rows fetched: {len(df)}")
                 if df.empty:
+                    print(f"No more data for category {category}. Exiting loop.")
                     break
                 df.to_csv(filename_template.format(batch_number), index=False)
-                offset += 1000
+                print(f"Saved batch {batch_number} for category {category}")
+                offset += 100000
                 batch_number += 1
 
     # Execute queries in parallel using ThreadPoolExecutor
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [executor.submit(fetch_and_save, category, query) for category, query in queries.items()]
-        # concurrent.futures.wait(futures)  # Wait for all tasks to complete
 
-
+# Generate latitude and longitude from address infomation
 def generate_coordinates_degauss(df, columns, threshold, output_folder):
-
+    """
+    Preprocess address data, execute a Docker-based geocoding tool, and retrieve geolocation data using Degauss.
+    
+    Parameters:
+    df (pandas.DataFrame): DataFrame containing address data
+    columns (list of str): List of column names representing address information
+    threshold (float): Threshold for the geocoder's score (accuracy)
+    save_intermediate (bool): Whether to save the intermediate preprocessed CSV before geocoding (default is False)
+    
+    Returns:
+    str: Name of the geocoded CSV file generated by the Docker container
+    """
+    
      # Convert columns to string type
     for col in columns:
         df[col] = df[col].astype(str)
@@ -124,10 +172,6 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
         df['address'] = df.apply(lambda row: ' '.join(row[columns]).lower(), axis=1)
         df['address'] = df['address'].str.title()
         df['address'] = df['address'].replace(r'[^a-zA-Z0-9 ]', ' ', regex=True)
-
-    # Reorder columns to ensure 'address' is the first column
-    cols = ['address'] + [col for col in df.columns if col != 'address']
-    df = df[cols]
     
     # Drop original address columns if they are no longer needed
     if len(columns) > 1:
@@ -144,7 +188,7 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
     abs_output_folder = os.path.abspath(output_folder)  # Convert to absolute path
     abs_preprocessed_file = os.path.abspath(preprocessed_file_path)  # Convert to absolute path
 
-      # Quote the paths to handle spaces
+    # Quote the paths to handle spaces
     quoted_output_folder = f'"{abs_output_folder}"'
     quoted_preprocessed_file = f'"{abs_preprocessed_file}"'
     
@@ -158,6 +202,7 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
     ]
     
     try:
+        # Execute Docker command to run the geocoder
         result = subprocess.run(' '.join(docker_command), shell=True, check=True, capture_output=True, text=True)
         print("Docker command executed successfully.")
         print(result.stdout)
@@ -165,12 +210,26 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
         print(f"Error executing Docker command: {e}")
         print(e.stderr)
 
-    # Define the output file name
+    # Define the output file name from the geocoder
     output_file_name = os.path.join(output_folder, f"preprocessed_1_geocoder_3.3.0_score_threshold_{threshold}.csv")
     return os.path.abspath(output_file_name)
 
-
+#Generate the FIPS code from latitude and longitude
 def generate_fips_degauss(df, year, output_folder):
+    """
+    Generates FIPS codes from latitude and longitude using a Docker-based geocoding service.
+
+    This function saves the provided DataFrame to a CSV file, runs a Docker container to process this file
+    and generate FIPS codes, and then updates the DataFrame with the FIPS codes before saving the final output.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing latitude and longitude data.
+    year (int): The year to be used for different FIPS code version.
+
+    Returns:
+    str or None: The path to the output file if successful, None otherwise.
+    """
+    
     logger.info("Generating FIPS...")
 
      # Convert the folder and file paths to absolute paths
@@ -181,7 +240,7 @@ def generate_fips_degauss(df, year, output_folder):
     
     preprocessed_file_path = os.path.join(output_folder, 'preprocessed_2.csv')
     # Columns that may exist and need to be dropped
-    columns_to_drop = {'matched_street', 'matched_zip', 'matched_city', 'matched_state', 'score', 'precision', 'geocode_result'}
+    columns_to_drop = {'matched_street', 'matched_zip', 'matched_city', 'matched_state', 'score', 'precision', 'geocode_result', 'address_1', 'state', 'city', 'zip'}
     # Drop only the columns that exist in the DataFrame
     columns_in_df = set(df.columns)  # Get the columns that exist in the DataFrame
     columns_to_drop = columns_to_drop.intersection(columns_in_df)  # Find intersection of existing columns and columns to drop
@@ -221,6 +280,7 @@ def generate_fips_degauss(df, year, output_folder):
         logger.error(f"Expected output file not found: {output_file}")
         return None
 
+#This fuction deal with different year of FIPS 
 def process_fips_generation(df, output_folder, base_filename):
     # Process FIPS generation for 2010 and 2020
     has_2010 = (df['year_for_fips'] == 2010).any()
@@ -282,18 +342,19 @@ def process_fips_generation(df, output_folder, base_filename):
         logger.error("Error: Neither FIPS file exists.")
     # Return the generated FIPS file paths   
     return generated_fips_files
-    
+
+#This function run three parts of category 
 def process_single_file(filepath, process_type, columns, threshold, date_column, output_dir, final_coordinate_files, final_fips_files):
     base_filename = os.path.splitext(os.path.basename(filepath))[0]
     logger.info(f"Processing file: {filepath}")
 
     if process_type == 'invalid':
         # Simply copy files to the new directory
-        # final_output = os.path.join(output_dir, f'{base_filename}_invalid.csv')
-        # shutil.copy(filepath, final_output)
+        final_output = os.path.join(output_dir, f'{base_filename}_invalid.csv')
+        shutil.copy(filepath, final_output)
         
-        # logger.info(f"Invalid file copied to {final_output}")
-        # logger.info("Due to the missing address and latitude and longitude, Files in invalid folder cannot link with SDoH database")
+        logger.info(f"Invalid file copied to {final_output}")
+        logger.info("Due to the missing address and latitude and longitude, Files in invalid folder cannot link with SDoH database")
         return None
 
     # Create a unique folder for each CSV file based on its name
@@ -329,8 +390,7 @@ def process_single_file(filepath, process_type, columns, threshold, date_column,
         # Check if 'latitude' and 'longitude' columns exist and rename them to 'lat' and 'lon'
         if 'latitude' in df.columns and 'longitude' in df.columns:
             df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
-        df[date_column] = pd.to_datetime(df[date_column], errors='coerce')
-        df['year_for_fips'] = df[date_column].dt.year.apply(lambda x: 2010 if x < 2020 else 2020)
+        df['year_for_fips'] = df[date_column].apply(lambda x: 2010 if x < 2020 else 2020)
         
         # Process FIPS generation and save the FIPS file
         fips_files = process_fips_generation(df, csv_output_dir, base_filename)
@@ -342,14 +402,14 @@ def process_single_file(filepath, process_type, columns, threshold, date_column,
         else:
             logger.warning(f"No FIPS files generated for {base_filename}")
 
-
+#This function deal with the file in parallel and compress into a ZIP files
 def process_directory(directory):
     # Set base configurations
-    output_base = './Linkage_result'
-    os.makedirs(output_base, exist_ok=True)
+    # output_base = './Linkage_result'
+    # os.makedirs(output_base, exist_ok=True)
     threshold = 0.7
     columns = ['address_1', 'city', 'state', 'zip']
-    date_column = 'visit_start_date'
+    date_column = 'year'
     
     # Determine the type of processing based on the directory name
     if 'valid_address' in directory:
@@ -362,7 +422,7 @@ def process_directory(directory):
         logger.info("Unknown directory type. Please check the directory path.")
         return
     
-    output_dir = os.path.join(output_base, process_type)
+    output_dir = os.path.join(linkage_result_dir, process_type)
     os.makedirs(output_dir, exist_ok=True)
     logger.info(f"Starting processing for {process_type}")
 
@@ -405,6 +465,13 @@ def process_directory(directory):
         logger.info(f"FIPS zip file created: {zip_file_path_fips}")
 
     logger.info(f"Completed processing for {process_type}")
+
+    # Now delete all the subdirectories and files except for the zip files
+    for root, dirs, files in os.walk(output_dir):
+        for dir_name in dirs:
+            dir_path = os.path.join(root, dir_name)
+            shutil.rmtree(dir_path)
+            logger.info(f"Deleted directory: {dir_path}")
           
         
 def main():
@@ -421,9 +488,9 @@ def main():
     # Call the function with parsed arguments
     omop_extraction(args.user, args.password, args.server, args.port, args.database)
     
-    process_directory('./Linkage_data/invalid_lat_lon_address')
-    process_directory('./Linkage_data/valid_address')
-    process_directory('./Linkage_data/valid_lat_long')
+    process_directory(os.path.join(linkage_data_dir, 'invalid_lat_lon_address'))
+    process_directory(os.path.join(linkage_data_dir, 'valid_address'))
+    process_directory(os.path.join(linkage_data_dir, 'valid_lat_long'))
 
 
 
