@@ -14,8 +14,8 @@ from datetime import datetime
 # Set the base directory for output, parallel to the code folder
 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 base_output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), f'../output_{timestamp}'))
-linkage_data_dir = os.path.join(base_output_dir, 'linkage_data')
-linkage_result_dir = os.path.join(base_output_dir, 'linkage_result')
+linkage_data_dir = os.path.join(base_output_dir, 'OMOP_data')
+linkage_result_dir = os.path.join(base_output_dir, 'OMOP_FIPS_result')
 
 # Create the Linkage_result directory if it doesn't exist
 os.makedirs(linkage_result_dir, exist_ok=True)
@@ -42,9 +42,9 @@ def omop_extraction(user, password, server, port, database):
         database (str): Database name
     
     Directories will be created:
-        - './Linkage_data/valid_lat_long'
-        - './Linkage_data/invalid_lat_lon_address'
-        - './Linkage_data/valid_address'
+        - './OMOP_data/valid_lat_long'
+        - './OMOP_data/invalid_lat_lon_address'
+        - './OMOP_data/valid_address'
     """
 
     # Fetch credentials from environment variables
