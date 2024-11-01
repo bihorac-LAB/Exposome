@@ -1,7 +1,7 @@
 
-# iSEDH
+# iSDoH
 
-iSEDH is the abbreviation of Intelligent Social and Environmental Determinants of Health
+iSDoH is the abbreviation of Intelligent Social and Environmental Determinants of Health
 
 ## Background and Introduction
 
