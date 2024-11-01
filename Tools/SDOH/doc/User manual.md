@@ -145,7 +145,7 @@ python OMOP_to_FIPS.py --user xxx --password xxx --server xxx --port xxx --datab
 ├── Linkage_data/
 │   ├── valid_address/        # Saved all patient encounter information with address
 │   ├── invalid_lat_lon_address/        #  Saved all patient encounter information without address or latitude, longitude
-│   └── valid_lat_long/     # Saved all patient encounter information without latitude and longitude
+│   └── valid_lat_long/     # Saved all patient encounter information with latitude and longitude
 
 ├── Linkage_result/
 │   ├── address/        # Saved the output result from valid_address folder
