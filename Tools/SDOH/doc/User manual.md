@@ -170,10 +170,10 @@ Users can upload their final_coordinates_files.zip on our web page, and we will 
 ## Step 3: SDOH Linkage Process
 
 ### Getting Started
-1. **Sign Up**: Begin by navigating to the [registration page](https://sdoh.rc.ufl.edu/)(#) to create an account. Follow the on-screen instructions to complete the sign-up process.
 
 [Demo](https://www.loom.com/share/bc4097b0d3db4f8f9132a06a49c17e71?sid=ad9671c1-6535-4bc9-b893-7e917efbcf75)
 
+1. **Sign Up**: Begin by navigating to the [registration page](https://sdoh.rc.ufl.edu/)(#) to create an account. Follow the on-screen instructions to complete the sign-up process.
 2. **Upload Your CSV File**: Once registered, you can upload the result zip file(e.g. output_with_fips.zip) if you follow the step 1&2. If you already have your fips file by yourself
 
 ### Required CSV File Format
