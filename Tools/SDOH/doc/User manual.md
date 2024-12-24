@@ -198,8 +198,6 @@ Prepare your CSV file to include the following columns:
   
 - **Downloading Results**: Once processing is complete, you will be able to download the final results directly from the web page.
 
-### Additional Guidance
-For further assistance or troubleshooting, refer to our [help section](#) or contact support.
 
 
 
