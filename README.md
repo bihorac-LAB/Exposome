@@ -2,7 +2,7 @@
 # iSDoH
 
 iSDoH is the abbreviation of Intelligent Social and Environmental Determinants of Health
-- [Demo Video](https://www.loom.com/share/bc4097b0d3db4f8f9132a06a49c17e71?sid=ad9671c1-6535-4bc9-b893-7e917efbcf75)
+- [Demo](https://www.loom.com/share/bc4097b0d3db4f8f9132a06a49c17e71?sid=ad9671c1-6535-4bc9-b893-7e917efbcf75)
 ## Background and Introduction
 
 The SDoH (Social Determints of Health) and environmental datasets are getting more and more popular for clinical research and highly needed by researchers around the world. However, because the various datasets are collected and shared by different government organizations, research institutes and so on, there is lack of a combined database for researchers to check, visualize and download data in a quick and reliable manner. 
