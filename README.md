@@ -1,7 +1,5 @@
 
-# iSDoH
-
-iSDoH is the abbreviation of Intelligent Social and Environmental Determinants of Health
+# Exposome
 
 [Demo](https://www.loom.com/share/bc4097b0d3db4f8f9132a06a49c17e71?sid=ad9671c1-6535-4bc9-b893-7e917efbcf75)
 ## Background and Introduction
