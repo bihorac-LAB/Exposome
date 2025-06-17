@@ -1,133 +1,122 @@
-# User Manual
-*Note: Please do not share any PHI information*
+**User Manual: Geocoding Patient Data for SDoH Linkage**
 
-## Step 1: Preparing Input Data
+**Note:** This manual does **not** require or share any PHI (Protected Health Information).
 
-This guide outlines the steps required to prepare input data for linking Social Determinants of Health (SDOH) using geographic information. The Census Tract (FIPS 11 code) is the key geographic identifier used to connect data to the SDOH database. Step 1 is used to prepare the information for generating FIPS11 code, and step 2 is to generate FIPS code using toolkit. Users need to prepare only **ONE** of the following data elements for each encounter: address, coordinates, or census tract information.
+---
 
-### Option 1. Address information 
-#### Prepare a folder to save some CSV files with formatted address data using one of the following acceptable formats:
-#### Format A: Multi-Column Address
-- **Columns**: `street`, `city`, `state`, `zip`
-- **Example**:
+### **Step 1: Preparing Input Data**
+This guide outlines the steps required to prepare input data for linking Social Determinants of Health (SDOH) using geographic information. The Census Tract (FIPS 11 code) is the key geographic identifier used to connect data to the SDOH database. Step 1 is used to prepare the information for generating FIPS11 code, and step 2 is to generate FIPS code using toolkit.
+
+You need to prepare **only ONE** of the following data elements per encounter:
+
+#### **Option 1: Address Information**
+You can input either:
+- **Format A: Multi-Column Address**
+  - Columns: `street`, `city`, `state`, `zip`
+- Example:
    
 | street | city | state | zip |
 |----------|----------|----------|----------|
 | 1250 W 16th St | Jacksonville | FL | 32209 |
 | 2001 SW 16th St | Gainesville | FL | 32608 |
 
-#### Format B: Single Column Address
-- **Column**: `address`
-- **Example**:
+- **Format B: Single Column Address**
+  - Column: `address`
+- Example:
    
 | address |
 |----------|
 | 1250 W 16Th St Jacksonville Fl 32209 |
 |2001 Sw 16Th St Gainesville Fl 32608 | 
 
-**Note**: If you can directly collect latitude, longitude, or FIPS code information for patients, preparing address information is not required.
-
-### Option 2: Coordinates Information 
-#### Prepare a folder to save some CSV files with latitude and longitude information for the patients.
-- **Columns**: `latitude`, `longitude`
-- **Example**:
+#### **Option 2: Coordinates**
+- Columns: `latitude`, `longitude`
+- Example:
 
 | latitude | longitude |
 |----------|----------|
 | 30.353463 | -81.6749 |
 | 29.634219 | -82.3433 |
 
-
-### Option 3: Census Tract Information
-
-####  Prepare a folder to save some CSV files with FIPS code information for the patients.
-- **Column**: `FIPS`
-- **Example**:
+#### **Option 3: Census Tract (FIPS)**
+- Column: `FIPS`
+- Example:
 
 | FIPS |
 |----------|
 | 12011080103 |
 | 12103026400 | 
 
+> If `FIPS` is available, skip Step 2.
 
-**Note**:  If you already have Census tract information for encounters, you can skip preparing coordinate information and skip step 2.
+---
 
-## Step 2: Get Census Tract Information
+### **Step 2: Generate Census Tract (FIPS) Information**
 
-We provide two methods to retrieve FIPS codes from coordinate data:
+To convert patient location data into Census Tract identifiers (FIPS11), we use a two-step geocoding process powered by [DeGAUSS](https://degauss.org), executed locally via Docker containers.
 
-- DeGAUSS Toolkit (Local Execution): Run the DeGAUSS Python toolkit locally for efficient FIPS code extraction.
-- Spatial Join (Web-based Tool): Perform spatial joins via our web page, leveraging a backend database to process and return FIPS codes. Users can download the resulting FIPS file upon completion.
+---
 
-| Method | Advantage | Disadvantage |
-|----------|----------|----------|
-| DeGAUSS | Faster and more efficient processing. | Limited to 2010 year and 2020 year FIPS codes; accuracy may be lower for other years. |
-| Spatial  Join | Provides year-specific FIPS codes, delivering higher accuracy with precise data for multiple years. | Requires longer processing times due to the complexity of spatial calculations.|
+####  Method: DeGAUSS Toolkit (Docker-based)
 
-For year-specific accuracy, we recommend using the Spatial Join method.
+DeGAUSS consists of two Docker containers:
+1. **Geocoder (3.3.0)** — Converts address to latitude/longitude
+2. **Census Block Group (0.6.0)** — Converts latitude/longitude to Census Tract FIPS codes
 
-### DeGAUSS Method
-The DeGAUSS method offers two distinct approaches based on the data source. One method is tailored for CSV file inputs (Case 1), while the other is optimized for OMOP database integration (Case 2).
+| Step | Purpose                   | Docker Image                                  |
+|------|----------------------------|-----------------------------------------------|
+| 1    | Address → Coordinates      | `ghcr.io/degauss-org/geocoder:3.3.0`          |
+| 2    | Coordinates → FIPS         | `ghcr.io/degauss-org/census_block_group:0.6.0`|
 
-#### Case 1: csv format
+---
 
-![image](https://github.com/user-attachments/assets/a1c5b366-dd78-4173-8ae7-33537e2a1bbc)
+### **Case 1: CSV File Input**
 
- **Input CSV File Should Contain**:
-- Patient encounter ID (e.g., 12345)
-- Patient encounter year, the column name should called **year** (e.g., 2024)
-- Address or coordinates information (refer to Step 1 for details)
+Input CSVs must contain a `year` column and **either**:
+- `street`, `city`, `state`, `zip` (**Option 1** — Multi-column)
+- `address` (**Option 2** — Single column)
+- `latitude`, `longitude` (**Option 3** — Coordinates only)
 
-**Python scripts input:**
+**Run Script Examples:**
+```bash
+# Option 1: Multi-column address
+python Address_to_FIPS.py -i ./your_csv_folder -o 1
 
-- -i：Input folder path *(required)*
+# Option 2: Single-column address
+python Address_to_FIPS.py -i ./your_csv_folder -o 2
 
-- -o: options for three different types of input, choices=[1, 2, 3]
-      1 = street, city, state, zip; 2 = address; 3 = latitude, longitude'  *(required)*
-  
-**Usage example:**
+# Option 3: Latitude/Longitude input
+python Address_to_FIPS.py -i ./your_csv_folder -o 3
+```
 
-*option 1:* 
-If your prepared data in option 1 format A in step 1, you can input below:
+**DeGAUSS Docker Commands (Executed Internally):**
+```bash
+# Step 1: Get Coordinates from Address
+docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" ghcr.io/degauss-org/geocoder:3.3.0 /tmp/<your_preprocessed_input.csv> <threshold>
 
-python Address_to_FIPS.py -i ./folder -o 1
+# Step 2: Get FIPS from Coordinates
+docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" ghcr.io/degauss-org/census_block_group:0.6.0 /tmp/<your_coordinate_output.csv> <year>
+```
 
-![image](https://github.com/user-attachments/assets/7758e7ef-9e30-417a-aefc-2e8703d519a2)
+Replace:
+- `ABS_OUTPUT_FOLDER` → absolute path to your output directory
+- `<threshold>` → numeric value (e.g. `0.7`)
+- `<year>` → either `2010` or `2020`
 
-*option 2:*
-If your prepared data in option 1 format B in step 1, you can input below:
+---
 
-python Address_to_FIPS.py -i ./folder -o 2
+### **Case 2: OMOP Database Input**
 
-![image](https://github.com/user-attachments/assets/4f5c94dd-bc64-499c-b10b-9c8875298169)
+This workflow pulls patient location and visit data from OMOP CDM tables and classifies the records into 3 groups before geocoding:
 
-*option 3:*
-If your prepared data in option 2 in step 1, you can input below:
+**Required Tables & Fields:**
 
-python Address_to_FIPS.py -i ./folder -o 3
-
-![image](https://github.com/user-attachments/assets/6d83742a-efee-427a-969c-ca73afa1ab36)
-
-**Output example:**
-
-Three options input have same output format.
-
-![image](https://github.com/user-attachments/assets/489d8cf4-cc02-4864-a7ff-fefb26167a86)
-
-#### Case 2: OMOP format
-
-![image](https://github.com/user-attachments/assets/79eacedc-e047-4e92-8b80-a67502c4b4e3)
-
-The scripts extract the required infomation form OMOP database to Linkage data and then convert the address or latitude, longitude to FIPS code.
-
- **Required Tables and Columns for OMOP Database**:
-
-| Table_name | Required_column_name |
-|----------|----------|
-| person | person_id |
-| visit_occurrence | visit_occurrence_id, visit_start_date, visit_end_date, person_id |
-| location | location_id, address_1, city, state, zip, latitude, longitude |
-| location history | location_id, entity_id, start_date, end_date |
+| Table              | Required Columns                                      |
+|--------------------|------------------------------------------------------|
+| `person`           | `person_id`                                          |
+| `visit_occurrence` | `visit_occurrence_id`, `visit_start_date`, `visit_end_date`, `person_id` |
+| `location`         | `location_id`, `address_1`, `city`, `state`, `zip`, `latitude`, `longitude` |
+| `location_history` | `entity_id`, `start_date`, `end_date`               |
 
  **Required Input for the Python Script**:
 - `user`: username for the OMOP database
@@ -136,76 +125,68 @@ The scripts extract the required infomation form OMOP database to Linkage data a
 - `port`: port number
 - `database`: database name for OMOP
 
-**Usage example:**
-
-python OMOP_to_FIPS.py --user xxx --password xxx --server xxx --port xxx --database xxx
-
-**Output example:**
-```plaintext
-├── Linkage_data/
-│   ├── valid_address/        # Saved all patient encounter information with address
-│   ├── invalid_lat_lon_address/        #  Saved all patient encounter information without address or latitude, longitude
-│   └── valid_lat_long/     # Saved all patient encounter information with latitude and longitude
-
-├── Linkage_result/
-│   ├── address/        # Saved the output result from valid_address folder
-|   |   ├──address_with_coordinates.zip   # Addresses with geographic coordinates
-│   │   └── address_with_fips.zip         # Addresses with FIPS codes
-│   ├── invalid/        #  Empty fodler (files in invalid_lat_lon_address do not meet the requirments for converting the FIPS code)
-│   └── latlong/        # Saved the output result from valid_lat_long folder
-|       └──latlong_with_fips.zip   # Latlong with valid_lat_long
-
+**Run Script Example:**
+```bash
+python OMOP_to_FIPS.py --user <USERNAME> --password <PASSWORD> --server <HOST> --port <PORT> --database <DBNAME>
 ```
 
-![image](https://github.com/user-attachments/assets/525ecf22-c50e-4c1a-97b7-adde416b18d3)
+---
 
+### Verified Generated Output Structure
 
-### Spatial Join Method (updating)
+**OMOP_data/** (raw extracted records)
+```
+OMOP_data/
+├── valid_address/               # Records with address, no lat/lon
+├── invalid_lat_lon_address/     # Records missing both address and lat/lon
+├── valid_lat_long/              # Records with lat/lon
+```
 
-#### Uploading Files for FIPS Code Generation
-Users can upload their final_coordinates_files.zip on our web page, and we will generate files containing the most accurate FIPS codes based on the chosen method.
+**OMOP_FIPS_result/** (geocoded results)
+```
+OMOP_FIPS_result/
+├── address/
+│   ├── address_with_coordinates.zip   # CSVs with lat/lon from address
+│   └── address_with_fips.zip          # CSVs with FIPS codes
+├── latlong/
+│   └── latlong_with_fips.zip          # CSVs with FIPS from coordinates
+├── invalid/                           # Usually empty; no usable location data
+```
 
+---
 
+### **Step 3: Linking with SDoH Data (Web Platform)**
 
-## Step 3: SDOH Linkage Process
+1. **Register** on the web platform
+2. **Upload** your `*_with_fips.zip` from Step 2
+3. **Input CSV Must Contain:**
+   - `person_id`
+   - `visit_occurrence_id`
+   - `year`
+   - `FIPS`
 
-### Getting Started
+4. **Result:**
+   - A fully linked dataset enriched with SDoH variables based on census tract and year
+   - Option to download the result as a CSV
 
-[Demo](https://www.loom.com/share/bc4097b0d3db4f8f9132a06a49c17e71?sid=ad9671c1-6535-4bc9-b893-7e917efbcf75)
+---
 
-1. **Sign Up**: Begin by navigating to the [registration page](https://sdoh.rc.ufl.edu/)(#) to create an account. Follow the on-screen instructions to complete the sign-up process.
-2. **Upload Your CSV File**: Once registered, you can upload the result zip file(e.g. output_with_fips.zip) if you follow the step 1&2. If you already have your fips file by yourself
+### **Appendix: Script Highlights**
 
-### Required CSV File Format
-Prepare your CSV file to include the following columns:
-- `person_id`
-- `visit_occurrence_id`
-- `year`
-- `FIPS`
+#### **`Address_to_FIPS.py` Logic**
+- Reads CSV files
+- Normalizes address or uses lat/lon
+- Runs DeGAUSS Docker container to get:
+  - Lat/lon (via `ghcr.io/degauss-org/geocoder`)
+  - FIPS (via `ghcr.io/degauss-org/census_block_group`)
+- Packages outputs to ZIP
 
-**Input example**:
+#### **`OMOP_to_FIPS.py` Logic**
+- Extracts data from OMOP CDM
+- Categorizes into valid/invalid address or coordinates
+- Executes FIPS generation like CSV method
+- Outputs compressed ZIP folders
 
-![image](https://github.com/user-attachments/assets/95b15319-fec2-459c-a079-3ea41813fe96)
+---
 
-
-
-**Output example:**
-
-![image](https://github.com/user-attachments/assets/ca76eedd-e5ce-4506-9093-aba1f69dbf75)
-
-
-
-### Processing and Results
-- **Processing**: After uploading your CSV file, our system will automatically execute the necessary Python script in the backend to perform SDOH linkage.
-  
-- **Downloading Results**: Once processing is complete, you will be able to download the final results directly from the web page.
-
-
-
-
-
-
-
-
-
-     
+This completes the geocoding preparation and execution guide for linking SDoH data.
