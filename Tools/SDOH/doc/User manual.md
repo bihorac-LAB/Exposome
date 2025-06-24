@@ -144,7 +144,7 @@ Used when geocoding fails or is imprecise. Includes:
 
 - `Zip missing` – ZIP code not provided 
 
-> Tip: You can improve detection of hospital addresses by adding more known addresses into the hardcoded list in the script. You add that to `<FileName>` just after you import all the packages at the top of the file.
+> Tip: You can improve detection of hospital addresses by adding more known addresses into the hardcoded list in the script. You add that to `Address_to_FIPS.py` at `Tools/SDOH/code/Address_to_FIPS.py` just after you import all the packages at the top of the file.
 > Name it `HOSPITAL_ADDRESSES`
 
 ---
