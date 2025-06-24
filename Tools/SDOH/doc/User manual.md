@@ -103,6 +103,50 @@ Replace:
 - `<threshold>` → numeric value (e.g. `0.7`)
 - `<year>` → either `2010` or `2020`
 
+**Output Structure**
+
+For each input file processed by the script, the following output files are generated:
+
+- `<filename>_with_coordinates.csv` Contains latitude and longitude coordinates appended to the original data. (Generated if coordinates are applicable.)
+
+- `<filename>_with_fips.csv` Contains FIPS codes appended to the original data.
+
+**Packaged Output**
+
+All generated files are compressed into two separate ZIP archives for convenience:
+
+- `output/coordinates_from_address_<timestamp>.zip` Contains all `<filename>_with_coordinates.csv files`.
+
+- `output/geocoded_fips_codes_<timestamp>.zip` Contains all `<filename>_with_fips.csv files.`
+
+> Note: `<timestamp>` is a datetime string indicating when the script was executed (e.g., 20250624_150230).
+
+
+**Output Columns Description**
+
+| Column         | Description                          |
+|----------------|--------------------------------------|
+| `Latitude`     | Latitude from geocoder               |
+| `Longitude`    | Longitude from geocoder              |
+| `geocode_result` | Indicates if geocoding was successful or imprecise |
+| `reason`       | Failure reason if applicable         |
+
+
+**reason Column Values**
+
+Used when geocoding fails or is imprecise. Includes: 
+
+- `Hospital address given` – Detected from known hardcoded hospital addresses 
+
+- `Street missing` – No street info provided 
+
+- `Blank/Incomplete address` – Address is empty or has missing components 
+
+- `Zip missing` – ZIP code not provided 
+
+> Tip: You can improve detection of hospital addresses by adding more known addresses into the hardcoded list in the script. You add that to `<FileName>` just after you import all the packages at the top of the file.
+> Name it `HOSPITAL_ADDRESSES`
+
 ---
 
 ### **Case 2: OMOP Database Input**
