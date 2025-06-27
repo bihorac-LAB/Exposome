@@ -131,10 +131,10 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
   
 
     try:
-        # read the geocoder output
+        # 1️⃣  read the geocoder output
         geocoded_df = pd.read_csv(output_file_name)
 
-        # bring the original address pieces back in (needed for the reason logic)
+        # 2️⃣  bring the original address pieces back in (needed for the reason logic)
         merge_cols = [c for c in ("street", "city", "state", "zip") if c in orig_df.columns]
         geocoded_df = (
             geocoded_df
@@ -167,7 +167,7 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
 
         def _reason(row):
             # ----- Successful geocode – hospital address test -----
-            if row["geocode_result"] == "geocoded":
+            if row["geocode_result"] == "Geocoded":
                 if {"street", "city", "state", "zip"}.issubset(row.index):
                     full_addr = " ".join(
                         [
@@ -194,15 +194,15 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
                 return "Street missing"
             return ""
 
-        # rebuild geocode_result & reason
+        # 3️⃣  rebuild geocode_result & reason
         geocoded_df.drop(columns=["geocode_result"], errors="ignore", inplace=True)
         geocoded_df["geocode_result"] = geocoded_df.apply(
-            lambda r: "geocoded" if _has_coords(r) else "imprecise_geocode",
+            lambda r: "Geocoded" if _has_coords(r) else "Imprecise Geocode",
             axis=1,
         )
         geocoded_df["reason"] = geocoded_df.apply(_reason, axis=1)
 
-        # tidy-up: remove auxiliary cols (_rid) but KEEP 'address'
+        # 4️⃣  tidy-up: remove auxiliary cols (_rid) but KEEP 'address'
         geocoded_df.drop(columns=[c for c in geocoded_df.columns if c.startswith("_")],
                          inplace=True, errors="ignore")
         geocoded_df.drop(columns=merge_cols, inplace=True, errors="ignore")
@@ -213,7 +213,7 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
                 geocoded_df["year"], errors="coerce"
             ).astype("Int64")
 
-        # save
+        # 5️⃣  save
         geocoded_df.to_csv(output_file_name, index=False)
         logger.info("geocode_result / reason fixed, _rid removed.")
 
@@ -495,6 +495,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-                
-    
-    
