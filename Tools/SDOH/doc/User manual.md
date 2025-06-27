@@ -29,6 +29,9 @@ You can input either:
 | 1250 W 16Th St Jacksonville Fl 32209 |
 |2001 Sw 16Th St Gainesville Fl 32608 | 
 
+> For accurate geocoding, make sure both street and zip are present in the input. whether as separate columns (Format A) or embedded within the full address string (Format B).
+Records missing either field may result in imprecise geocode.
+
 #### **Option 2: Coordinates**
 - Columns: `latitude`, `longitude`
 - Example:
@@ -128,7 +131,7 @@ All generated files are compressed into two separate ZIP archives for convenienc
 |----------------|--------------------------------------|
 | `Latitude`     | Latitude from geocoder               |
 | `Longitude`    | Longitude from geocoder              |
-| `geocode_result` | Indicates if geocoding was successful or imprecise |
+| `geocode_result` | Indicates the outcome of geocoding — `geocoded` for successful matches, `Imprecise Geocode` if it failed |
 | `reason`       | Failure reason if applicable         |
 
 
@@ -147,6 +150,14 @@ Used when geocoding fails or is imprecise. Includes:
 > Tip: You can improve detection of hospital addresses by adding more known addresses into the hardcoded list in the script. You add that to `Address_to_FIPS.py` at `Tools/SDOH/code/Address_to_FIPS.py` just after you import all the packages at the top of the file.
 > Name it `HOSPITAL_ADDRESSES`
 
+### Note on HOSPITAL_ADDRESSES Format
+
+When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FIPS.py`, ensure each address:
+
+- Is written as a full, single-line string.
+- Uses only lowercase letters and numbers.
+- Has no commas or special characters.
+- Fields are separated by single spaces.
 ---
 
 ### **Case 2: OMOP Database Input**
