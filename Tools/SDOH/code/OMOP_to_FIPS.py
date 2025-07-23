@@ -11,6 +11,21 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import zipfile
 from datetime import datetime
 
+
+# -------------------------------------------------------------------
+# A quick-lookup set of FULL normalized hospital addresses.
+# Add / update as needed.  All entries must be lower-case and trimmed.
+HOSPITAL_ADDRESSES = {
+    "1000 peachtree park dr ne atlanta ga 30309",
+    "240 nw 25th st miami fl 33127",
+    "1400 briarcliff rd ne atlanta ga 30306",
+    # …extend the list …
+}
+# -------------------------------------------------------------------
+
+
+
+
 # Set the base directory for output, parallel to the code folder
 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
 base_output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), f'../output_{timestamp}'))
@@ -142,6 +157,102 @@ def omop_extraction(user, password, server, port, database):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [executor.submit(fetch_and_save, category, query) for category, query in queries.items()]
 
+
+def flag_geocode_results(geocoded_df, orig_df):
+    try:
+        # 2️⃣  bring the original address pieces back in (needed for the reason logic)
+        geocoded_df = geocoded_df.rename(columns={'address_1':'street'})
+        orig_df = orig_df.rename(columns={'address_1':'street'})
+        print('columns in orig_df: ', orig_df.columns)
+        print('columns in geocoded_df: ', geocoded_df.columns)
+        merge_cols = [c for c in ("street", "city", "state", "zip") if c in orig_df.columns]
+        geocoded_df = (
+            geocoded_df
+            .merge(orig_df[merge_cols + ["_rid"]], on="_rid", how="left")
+            .sort_values("_rid")
+            .reset_index(drop=True)
+        )
+
+        geocoded_df = geocoded_df.drop(columns=['city_x','state_x','zip_x','street_x'])
+        geocoded_df = geocoded_df.rename(columns={'city_y':'city', 'state_y':'state', 'zip_y':'zip','street_y':'street'})
+
+        # ── helpers ────────────────────────────────────────────────
+        MISSING_SENTINELS = {"nan", "na", "n/a", "none", "null", ""}
+
+        def _blank(x: object) -> bool:
+            return pd.isna(x) or str(x).strip().lower() in MISSING_SENTINELS
+
+        def _has_coords(row) -> bool:
+            """Return True **only** if lat/lon are real numbers inside
+            normal geographic limits (and not NaN)."""
+            try:
+                lat = float(row.get("lat", ""))
+                lon = float(row.get("lon", ""))
+            except (ValueError, TypeError):
+                return False
+            if pd.isna(lat) or pd.isna(lon):
+                return False
+            return -90.0 <= lat <= 90.0 and -180.0 <= lon <= 180.0
+
+        def _zip_clean(z):
+            z = str(z).strip().lower()
+            return z[:-2] if z.endswith(".0") else z
+
+        def _reason(row):
+            # ----- Successful geocode – hospital address test -----
+            if row["geocode_result"] == "Geocoded":
+                if {"street", "city", "state", "zip"}.issubset(row.index):
+                    full_addr = " ".join(
+                        [
+                            str(row.get("street", "")).strip().lower(),
+                            str(row.get("city", "")).strip().lower(),
+                            str(row.get("state", "")).strip().lower(),
+                            _zip_clean(row.get("zip", "")),
+                        ]
+                    ).strip()
+                else:  # single-column case
+                    full_addr = (
+                        str(row.get("address", ""))
+                        .lower()
+                        .strip()
+                    )
+                return "Hospital address given" if full_addr in HOSPITAL_ADDRESSES else ""
+
+            # ----- Imprecise geocode – why? -----
+            if all(_blank(row.get(c, "")) for c in ("street", "city", "state", "zip")):
+                return "Blank/Incomplete address"
+            if _blank(row.get("zip", "")):
+                return "Zip missing"
+            if _blank(row.get("street", "")):
+                return "Street missing"
+            return ""
+
+        # 3️⃣  rebuild geocode_result & reason
+        geocoded_df.drop(columns=["geocode_result"], errors="ignore", inplace=True)
+        geocoded_df["geocode_result"] = geocoded_df.apply(
+            lambda r: "Geocoded" if _has_coords(r) else "Imprecise Geocode",
+            axis=1,
+        )
+        geocoded_df["reason"] = geocoded_df.apply(_reason, axis=1)
+
+        # 4️⃣  tidy-up: remove auxiliary cols (_rid) but KEEP 'address'
+        geocoded_df.drop(columns=[c for c in geocoded_df.columns if c.startswith("_")],
+                         inplace=True, errors="ignore")
+        geocoded_df.drop(columns=merge_cols, inplace=True, errors="ignore")
+
+        # normalise year (no trailing “.0”)
+        if "year" in geocoded_df.columns:
+            geocoded_df["year"] = pd.to_numeric(
+                geocoded_df["year"], errors="coerce"
+            ).astype("Int64")
+        
+        logger.info("geocode_result / reason fixed, _rid removed.")
+
+    except Exception as e:
+        logger.warning(f"Could not post-process geocoder output: {e}")
+
+    return geocoded_df
+
 # Generate latitude and longitude from address infomation
 def generate_coordinates_degauss(df, columns, threshold, output_folder):
     """
@@ -156,8 +267,8 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
     Returns:
     str: Name of the geocoded CSV file generated by the Docker container
     """
-    
-     # Convert columns to string type
+
+    # Convert columns to string type
     for col in columns:
         df[col] = df[col].astype(str)
     for col in columns:
@@ -240,7 +351,7 @@ def generate_fips_degauss(df, year, output_folder):
     
     preprocessed_file_path = os.path.join(output_folder, 'preprocessed_2.csv')
     # Columns that may exist and need to be dropped
-    columns_to_drop = {'matched_street', 'matched_zip', 'matched_city', 'matched_state', 'score', 'precision', 'geocode_result', 'address_1', 'state', 'city', 'zip'}
+    columns_to_drop = {'matched_street', 'matched_zip', 'matched_city', 'matched_state', 'score', 'precision', 'address_1', 'state', 'city', 'zip'}
     # Drop only the columns that exist in the DataFrame
     columns_in_df = set(df.columns)  # Get the columns that exist in the DataFrame
     columns_to_drop = columns_to_drop.intersection(columns_in_df)  # Find intersection of existing columns and columns to drop
@@ -365,14 +476,26 @@ def process_single_file(filepath, process_type, columns, threshold, date_column,
 
     if process_type == 'address':
         df = pd.read_csv(filepath)
+
+        orig_df = df.copy(deep=True)
+        orig_df["_rid"] = orig_df.index
+        df["_rid"]      = orig_df["_rid"]
+        if "zip" in orig_df.columns:
+            orig_df["zip"] = (
+                orig_df["zip"]
+                .fillna("")
+                .astype(str)
+                .str.replace(r"\.0$", "", regex=True)
+                .str.strip()
+            )
+
         geocoded_file = generate_coordinates_degauss(df, columns, threshold, csv_output_dir)
         
         #get the coordinates files
         latlon = pd.read_csv(geocoded_file)
-        columns_to_drop = ['matched_street', 'matched_zip', 'matched_city', 'matched_state', 'score', 'precision', 'geocode_result']
+        columns_to_drop = ['matched_street', 'matched_zip', 'matched_city', 'matched_state', 'score', 'precision']
         latlon.drop(columns=[col for col in columns_to_drop if col in latlon.columns], inplace=True)
         latlon.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
-        
         output_file = os.path.join(csv_output_dir, f"{base_filename}_with_coordinates.csv")
         latlon.to_csv(output_file, index=False)
         logger.info(f"Coordinates file generated: {output_file}")
@@ -381,6 +504,18 @@ def process_single_file(filepath, process_type, columns, threshold, date_column,
         
     elif process_type == 'latlong':
         df = pd.read_csv(filepath)
+
+        orig_df = df.copy(deep=True)
+        orig_df["_rid"] = orig_df.index
+        df["_rid"]      = orig_df["_rid"]
+        if "zip" in orig_df.columns:
+            orig_df["zip"] = (
+                orig_df["zip"]
+                .fillna("")
+                .astype(str)
+                .str.replace(r"\.0$", "", regex=True)
+                .str.strip()
+            )
         # Assume latlong processing includes geocoding as well
         geocoded_file = filepath  # For simplicity
 
@@ -390,8 +525,12 @@ def process_single_file(filepath, process_type, columns, threshold, date_column,
         # Check if 'latitude' and 'longitude' columns exist and rename them to 'lat' and 'lon'
         if 'latitude' in df.columns and 'longitude' in df.columns:
             df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
-        df['year_for_fips'] = df[date_column].apply(lambda x: 2010 if x < 2020 else 2020)
+
+        df["_rid"] = orig_df["_rid"].values
+        df = flag_geocode_results(df, orig_df)
         
+        df['year_for_fips'] = df[date_column].apply(lambda x: 2010 if x < 2020 else 2020)
+
         # Process FIPS generation and save the FIPS file
         fips_files = process_fips_generation(df, csv_output_dir, base_filename)
         
