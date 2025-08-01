@@ -25,34 +25,15 @@ docker run -it --rm \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
   sri052/exposome-geocoder-pipeline:multiarch \
-  /app/code/Address_to_FIPS.py -i input_folder -o 1
+  /app/code/Address_to_FIPS.py -i input_folder -o <option>
 ```
-#### Command Usage
+**Options for `-o` parameter:**
+- `1` - Multi-column address
+- `2` - Single-column address  
+- `3` - Latitude/Longitude input
 
-```bash
-python Address_to_FIPS.py -i ./your_csv_folder -o <option>
-```
+Replace `<option>` with `1`, `2`, or `3` based on your data format.
 
-#### Output Options (`-o` parameter):
-
-| Option | Description |
-|--------|-------------|
-| `1` | Multi-column address |
-| `2` | Single-column address |
-| `3` | Latitude/Longitude input |
-
-#### Example Commands:
-
-```bash
-# Option 1: Multi-column address
-python Address_to_FIPS.py -i ./your_csv_folder -o 1
-
-# Option 2: Single-column address
-python Address_to_FIPS.py -i ./your_csv_folder -o 2
-
-# Option 3: Latitude/Longitude input
-python Address_to_FIPS.py -i ./your_csv_folder -o 3
-```
 
 ### Run `OMOP_to_FIPS.py`:
 ```bash
@@ -63,11 +44,11 @@ docker run -it --rm \
   -w /workspace \
   sri052/exposome-geocoder-pipeline:multiarch \
   /app/code/OMOP_to_FIPS.py \
-    --user <> \
-    --password <> \
-    --server <> \
-    --port <> \
-    --database <>
+    --user <your_username>\
+    --password <your_password> \
+    --server <server_address> \
+    --port <port_number> \
+    --database <database_name>
 ```
 
 # 🛠️ For Developers
