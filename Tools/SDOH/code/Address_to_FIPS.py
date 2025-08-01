@@ -20,6 +20,7 @@ HOSPITAL_ADDRESSES = {
     # …extend the list …
 }
 # -------------------------------------------------------------------
+host_base = os.environ["HOST_PWD"] 
 
 # logger.add(sys.stderr, format="{time} {level} {message}", filter="my_module", level="INFO")
 #get the log file
@@ -104,14 +105,15 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
     abs_output_folder = os.path.abspath(output_folder)  # Convert to absolute path
     abs_preprocessed_file = os.path.abspath(preprocessed_file_path)  # Convert to absolute path
 
-      # Quote the paths to handle spaces
-    quoted_output_folder = f'"{abs_output_folder}"'
-    quoted_preprocessed_file = f'"{abs_preprocessed_file}"'
+    container_cwd = os.getcwd()  # This will be /workspace when using -w /workspace
+
+    # Calculate the relative path from the container's working directory
+    host_folder = os.path.join(host_base, os.path.relpath(abs_output_folder, container_cwd))
     
     # Define the Docker command
     docker_command = [
         'docker', 'run', '--rm',
-        '-v', f'{quoted_output_folder}:/tmp',
+        '-v', f'{host_folder}:/tmp',
         'ghcr.io/degauss-org/geocoder:3.3.0',
        f'/tmp/{os.path.basename(abs_preprocessed_file)}',
         str(threshold)
@@ -262,8 +264,13 @@ def generate_fips_degauss(df, year, output_folder):
     abs_preprocessed_file = os.path.abspath(preprocessed_file_path).replace("\\", "/")
     
     output_file = os.path.join(output_folder, f"preprocessed_2_census_block_group_0.6.0_{year}.csv")    
-#     output_file = f"{df.replace('.csv', '')}_census_block_group_0.6.0_{year}.csv"
-    docker_command2 = ["docker", "run", "--rm", "-v", f'{abs_output_folder}:/tmp', "ghcr.io/degauss-org/census_block_group:0.6.0", f'/tmp/{os.path.basename(abs_preprocessed_file)}', str(year)]
+    
+    container_cwd = os.getcwd()  # This will be /workspace when using -w /workspace
+
+    # Calculate the relative path from the container's working directory
+    host_folder = os.path.join(host_base, os.path.relpath(abs_output_folder, container_cwd))
+    #output_file = f"{df.replace('.csv', '')}_census_block_group_0.6.0_{year}.csv"
+    docker_command2 = ["docker", "run", "--rm", "-v", f'{host_folder}:/tmp', "ghcr.io/degauss-org/census_block_group:0.6.0", f'/tmp/{os.path.basename(abs_preprocessed_file)}', str(year)]
     try:
         result = subprocess.run(docker_command2, check=True, capture_output=True, text=True)
         logger.info("Docker command executed successfully.")
