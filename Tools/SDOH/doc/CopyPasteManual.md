@@ -10,7 +10,7 @@ Copy & Pasting is encouraged!
 - `mkdir Address-to-fips`
 - `mkdir Address-to-fips/input` *<-- place input files here*
 - `docker build --no-cache -t exposome-geocode-pipeline .`
-- `docker run -it --rm   -v "$(pwd)":/workspace   -v /var/run/docker.sock:/var/run/docker.sock   -e HOST_PWD="$(pwd)"   -w /workspace   exposome-geocode-pipeline   /app/code/Address_to_FIPS.py -i Address-to-fips/input -o 3`
+- `docker run -it --rm   -v "$(pwd)":/workspace   -v /var/run/docker.sock:/var/run/docker.sock   -e HOST_PWD="$(pwd)"   -w /workspace   exposome-geocode-pipeline   /app/code/Address_to_FIPS.py -i Address-to-fips/input`
 
 Directory names shown above can be modified to your preference. If you decide to change it, then make sure to also modify the path given for the *-i* flag in the docker run command
 

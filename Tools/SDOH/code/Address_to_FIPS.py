@@ -312,8 +312,6 @@ def process_csv_file(file, input_folder, final_coordinate_files):
         return encounter_with_fips_file
 
     logger.info(f"Processing file: {file_path}")
-
-    logger.info(f"Processing file: {file_path}")
     df = pd.read_csv(file_path)
     df.rename(columns={col: col.lower().strip() for col in df.columns}, inplace=True)
     if "latitude" in df.columns and "longitude" in df.columns:
@@ -332,7 +330,7 @@ def process_csv_file(file, input_folder, final_coordinate_files):
     # Step 1: Check if latitude and longitude are provided (skip geocode if present)
     if option == 3:
         logger.info("Using provided latitude and longitude columns, skipping geocoding.")
-        df = pd.read_csv(file_path)
+        
         logger.info(f"CSV Headers: {df.columns}")
         logger.info(f"EED HEAD: {df['EncounterEffectiveDate'].head}")
         df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
@@ -356,9 +354,7 @@ def process_csv_file(file, input_folder, final_coordinate_files):
     elif option in [1, 2]:
         logger.info("Latitude and longitude not provided. Using address columns for geocoding.")
         threshold = 0.7
-        columns = ['street', 'city', 'state', 'zip'] if args.option == 1 else ['address']
-
-        df = pd.read_csv(file_path)
+        columns = ['street', 'city', 'state', 'zip'] if option == 1 else ['address']
         geocoded_file = generate_coordinates_degauss(df, columns, threshold, output_folder)
         logger.info(f"Geocoded file created: {geocoded_file}")
 
