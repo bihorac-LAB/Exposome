@@ -312,11 +312,25 @@ def process_csv_file(file, input_folder, args, final_coordinate_files):
         return encounter_with_fips_file
 
     logger.info(f"Processing file: {file_path}")
-
+    df = pd.read_csv(file_path)
+    df.rename(columns={col: col.lower().strip() for col in df.columns}, inplace=True)
+    if "latitude" in df.columns and "longitude" in df.columns:
+        option = 3
+        logger.info(f"Detected lat/lon columns in {file}, using option 3.")
+    elif "address" in df.columns:
+        option = 2
+        logger.info(f"Detected address column in {file}, using option 2.")
+    elif all(col in df.columns for col in ["street", "city", "state", "zip"]):
+        option = 1
+        logger.info(f"Detected separate address columns in {file}, using option 1.")
+    else:
+        logger.error(f"No valid location columns found in {file}, skipping.")
+        return None
+    
     # Step 1: Check if latitude and longitude are provided (skip geocode if present)
-    if args.option == 3:
+    if option == 3:
         logger.info("Using provided latitude and longitude columns, skipping geocoding.")
-        df = pd.read_csv(file_path)
+        
         logger.info(f"CSV Headers: {df.columns}")
         logger.info(f"EED HEAD: {df['EncounterEffectiveDate'].head}")
         df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
@@ -337,12 +351,10 @@ def process_csv_file(file, input_folder, args, final_coordinate_files):
                 return None
 
     # Step 2: If latitude and longitude are not provided, check for address columns
-    elif args.option in [1, 2]:
+    elif option in [1, 2]:
         logger.info("Latitude and longitude not provided. Using address columns for geocoding.")
         threshold = 0.7
-        columns = ['street', 'city', 'state', 'zip'] if args.option == 1 else ['address']
-
-        df = pd.read_csv(file_path)
+        columns = ['street', 'city', 'state', 'zip'] if option == 1 else ['address']
         geocoded_file = generate_coordinates_degauss(df, columns, threshold, output_folder)
         logger.info(f"Geocoded file created: {geocoded_file}")
 
@@ -406,8 +418,6 @@ def main():
     parser = argparse.ArgumentParser(description='FIPS Geocoding')
     parser.add_argument('-i', '--input', type=str, required=True, help='Input folder path containing CSV files')
     parser.add_argument('--debug', dest='debug', action='store_true', help='Enable debug logging')
-    parser.add_argument('-o', '--option', type=int, choices=[1, 2, 3], required=True, 
-                        help='Option for input type: 1 = street, city, state, zip; 2 = address; 3 = latitude, longitude')
     
     args = parser.parse_args()
     input_folder = args.input
@@ -420,21 +430,6 @@ def main():
     # Generate timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-     # Handle each option case
-    if args.option == 1:
-        columns = ['street', 'city', 'state', 'zip']
-        logger.info(f"Option 1 selected: street={columns[0]}, city={columns[1]}, state={columns[2]}, zip={columns[3]}")
-
-    elif args.option == 2:
-        columns = ['address']
-        logger.info(f"Option 2 selected: address={columns[0]}")
-
-    elif args.option == 3:
-        latitude = 'latitude'
-        longitude = 'longitude'
-        logger.info(f"Option 3 selected: latitude={latitude}, longitude={longitude}")
-
-    
     csv_files = [f for f in os.listdir(input_folder) if f.endswith('.csv')]
 
     final_fips_files = []  # Collect all final fips files for zipping
