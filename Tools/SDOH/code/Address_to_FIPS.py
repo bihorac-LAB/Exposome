@@ -332,15 +332,14 @@ def process_csv_file(file, input_folder, args, final_coordinate_files):
         logger.info("Using provided latitude and longitude columns, skipping geocoding.")
         
         logger.info(f"CSV Headers: {df.columns}")
-        logger.info(f"EED HEAD: {df['EncounterEffectiveDate'].head}")
         df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
 
-        date_column_candidates = ['EncounterEffectiveDate']
+        date_column_candidates = ['encountereffectivedate']
+        lowercased_columns = {col.lower(): col for col in df.columns}
         if "year" in df.columns:
             df['year_for_fips'] = df['year'].apply(lambda x: 2010 if x < 2020 else 2020)
         else:
-            date_column_candidates = ['EncounterEffectiveDate', 'AdmitDatetime', 'DischargeDatetime', 'BirthDate']
-            date_column = next((col for col in date_column_candidates if col in df.columns), None)
+            date_column = next((col for key, col in lowercased_columns.items() if key in date_column_candidates), None)
             if date_column:
                 logger.info(f"Using '{date_column}' to infer year_for_fips.")
                 df['year'] = pd.to_datetime(df[date_column], errors='coerce').dt.year
