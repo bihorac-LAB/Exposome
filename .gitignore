@@ -1,0 +1,8 @@
+venv
+tmp/*
+**/output/*
+*/Input/*
+**/log/*
+Tools/SDOH/Address-to-fips/*
+
+input_csvs/
