@@ -82,14 +82,7 @@ Input CSVs must contain a `year` column and **either**:
 
 **Run Script Examples:**
 ```bash
-# Option 1: Multi-column address
-python Address_to_FIPS.py -i ./your_csv_folder -o 1
-
-# Option 2: Single-column address
-python Address_to_FIPS.py -i ./your_csv_folder -o 2
-
-# Option 3: Latitude/Longitude input
-python Address_to_FIPS.py -i ./your_csv_folder -o 3
+python Address_to_FIPS.py -i ./your_csv_folder 
 ```
 
 **DeGAUSS Docker Commands (Executed Internally):**
