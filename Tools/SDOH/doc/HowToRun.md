@@ -29,7 +29,7 @@ docker run -it --rm \
   -v "$(pwd)":/workspace \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
-  `omerkahveciuf/exposome-geocoder:1.0.1 \
+  omerkahveciuf/exposome-geocoder:1.0.1 \
   /app/code/OMOP_to_FIPS.py \
     --user <your_username>\
     --password <your_password> \
