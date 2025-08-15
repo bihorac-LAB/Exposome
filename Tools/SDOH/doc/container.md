@@ -1,14 +1,7 @@
 # Docker Run Commands for `exposome-geocoder-pipeline`
 
 ## Container Name:
-`sri052/exposome-geocoder-pipeline:multiarch`
-
-## Docker pull:
-```bash
-docker pull sri052/exposome-geocoder-pipeline:multiarch
-```
-
----
+`omerkahveciuf/exposome-geocoder:1.0.1`
 
 > **Note:** For Windows systems, run the commands from WSL root  
 > **Note:** Make sure your `input_folder` is in the same directory as your working directory!
@@ -24,16 +17,10 @@ docker run -it --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
-  sri052/exposome-geocoder-pipeline:multiarch \
-  /app/code/Address_to_FIPS.py -i input_folder -o <option>
+  omerkahveciuf/exposome-geocoder:1.0.1 \
+  /app/code/Address_to_FIPS.py -i <input_folder>
 ```
-**Options for `-o` parameter:**
-- `1` - Multi-column address
-- `2` - Single-column address  
-- `3` - Latitude/Longitude input
-
-Replace `<option>` with `1`, `2`, or `3` based on your data format.
-
+Replace input_folder with the input folder storing your data.
 
 ### Run `OMOP_to_FIPS.py`:
 ```bash
@@ -42,7 +29,7 @@ docker run -it --rm \
   -v "$(pwd)":/workspace \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
-  sri052/exposome-geocoder-pipeline:multiarch \
+  `omerkahveciuf/exposome-geocoder:1.0.1 \
   /app/code/OMOP_to_FIPS.py \
     --user <your_username>\
     --password <your_password> \
