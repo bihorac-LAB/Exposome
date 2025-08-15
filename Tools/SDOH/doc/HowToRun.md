@@ -8,7 +8,7 @@
 
 ---
 
-## Available Scripts
+## Run Commands
 
 ### Run `Address_to_FIPS.py`:
 ```bash
