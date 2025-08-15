@@ -3,6 +3,10 @@
 ## Container Name:
 `omerkahveciuf/exposome-geocoder:1.0.1`
 
+## Pre-requisite:
+- **docker Desktop** - make sure it is running.
+- **UF health VPN** - Make sure you are connected to UF health VPN for OMOP script.
+
 > **Note:** For Windows systems, run the commands from WSL root  
 > **Note:** Make sure your `input_folder` is in the same directory as your working directory!
 
