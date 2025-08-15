@@ -262,7 +262,7 @@ def generate_fips_degauss(df, year, output_folder):
         df.drop(columns=columns_to_drop, inplace=True)
         
     #df.rename(columns={'Latitude': 'lat', 'Longitude': 'lon'}, inplace=True)
-    df = df.rename(columns={'Latitude': 'lat', 'Longitude': 'lon'})
+    df = df.rename(columns={'Latitude': 'lat', 'Longitude': 'lon', 'latitude': 'lat', 'longitude' : 'lon'})
 
     df.to_csv(preprocessed_file_path, index=False)
 
@@ -365,7 +365,8 @@ def process_csv_file(file, input_folder, final_coordinate_files):
         if not os.path.exists(output_file):
             df.drop(columns=['matched_street', 'matched_zip', 'matched_city', 'matched_state', 'score', 'precision', 'address'], inplace=True, errors='ignore')
             df.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
-            df.to_csv(output_file, index=False)
+            out_df = df.drop(columns=['year_for_fips'], errors='ignore')
+            out_df.to_csv(output_file, index=False)
             logger.info(f"Coordinate file saved: {output_file}")
         else:
             logger.info(f"Coordinate file already exists, skipping save: {output_file}")
@@ -436,7 +437,7 @@ def main():
 
    # Step 1: Use ThreadPoolExecutor to process up to 10 files concurrently
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        futures = {executor.submit(process_csv_file, file, input_folder, args, final_coordinate_files): file for file in csv_files}
+        futures = {executor.submit(process_csv_file, file, input_folder, final_coordinate_files): file for file in csv_files}
 
         for future in concurrent.futures.as_completed(futures):
             file = futures[future]
