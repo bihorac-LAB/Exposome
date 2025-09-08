@@ -334,20 +334,11 @@ def process_csv_file(file, input_folder, final_coordinate_files):
         logger.info(f"CSV Headers: {df.columns}")
         df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
 
-        date_column_candidates = ['encountereffectivedate']
-        lowercased_columns = {col.lower(): col for col in df.columns}
         if "year" in df.columns:
             df['year_for_fips'] = df['year'].apply(lambda x: 2010 if x < 2020 else 2020)
         else:
-            date_column = next((col for key, col in lowercased_columns.items() if key in date_column_candidates), None)
-            if date_column:
-                logger.info(f"Using '{date_column}' to infer year_for_fips.")
-                df['year'] = pd.to_datetime(df[date_column], errors='coerce').dt.year
-                df.dropna(subset=['year'], inplace=True)
-                df['year_for_fips'] = df['year'].apply(lambda x: 2010 if x < 2020 else 2020)
-            else:
-                logger.error("No valid date column found to infer year.")
-                return None
+            logger.error("No valid date column found to infer year.")
+            return None
 
     # Step 2: If latitude and longitude are not provided, check for address columns
     elif option in [1, 2]:
