@@ -51,3 +51,49 @@ The web application is deployed at [HiPerGator](https://www.rc.ufl.edu/about/hip
 
 ![workflow](./assets/External%20investigator%20workflow.png)
 
+
+# Docker Run Commands for `exposome-geocoder-pipeline`
+
+## Container Name:
+`omerkahveciuf/exposome-geocoder:1.0.1`
+
+## Pre-requisite:
+- **docker Desktop** - make sure it is running.
+- **UF health VPN** - Make sure you are connected to UF health VPN for OMOP script.
+
+> **Note:** For Windows systems, run the commands from WSL root  
+> **Note:** Make sure your `input_folder` is in the same directory as your working directory!
+
+---
+
+## Run Commands
+
+### Run `Address_to_FIPS.py`:
+```bash
+docker run -it --rm \
+  -v "$(pwd)":/workspace \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e HOST_PWD="$(pwd)" \
+  -w /workspace \
+  omerkahveciuf/exposome-geocoder:1.0.1 \
+  /app/code/Address_to_FIPS.py -i <input_folder>
+```
+Replace input_folder with the input folder storing your data.
+
+### Run `OMOP_to_FIPS.py`:
+```bash
+docker run -it --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$(pwd)":/workspace \
+  -e HOST_PWD="$(pwd)" \
+  -w /workspace \
+  omerkahveciuf/exposome-geocoder:1.0.1 \
+  /app/code/OMOP_to_FIPS.py \
+    --user <your_username>\
+    --password <your_password> \
+    --server <server_address> \
+    --port <port_number> \
+    --database <database_name>
+```
+
+
