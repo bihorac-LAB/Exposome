@@ -90,6 +90,7 @@ docker run -it --rm \
     --database <database_name>
 ```
 > Add your database credentials.
+
 ---
 
 **Output Structure**
@@ -134,9 +135,10 @@ Used when geocoding fails or is imprecise. Includes:
 - `Zip missing` – ZIP code not provided 
 
 > Tip: You can improve detection of hospital addresses by adding more known addresses into the hardcoded list in the script. You add that to `Address_to_FIPS.py` at `Tools/SDOH/code/Address_to_FIPS.py` just after you import all the packages at the top of the file.
+
 > Name it `HOSPITAL_ADDRESSES`
 
-### Note on HOSPITAL_ADDRESSES Format
+#### Note on HOSPITAL_ADDRESSES Format
 
 When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FIPS.py`, ensure each address:
 
@@ -144,7 +146,40 @@ When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FI
 - Uses only lowercase letters and numbers.
 - Has no commas or special characters.
 - Fields are separated by single spaces.
-  
+
+
+### **Generate Census Tract (FIPS) Information**
+
+To convert patient location data into Census Tract identifiers (FIPS11), we use a two-step geocoding process powered by [DeGAUSS](https://degauss.org), executed locally via Docker containers.
+
+
+####  Method: DeGAUSS Toolkit (Docker-based)
+
+DeGAUSS consists of two Docker containers:
+1. **Geocoder (3.3.0)** — Converts address to latitude/longitude
+2. **Census Block Group (0.6.0)** — Converts latitude/longitude to Census Tract FIPS codes
+
+| Step | Purpose                   | Docker Image                                  |
+|------|----------------------------|-----------------------------------------------|
+| 1    | Address → Coordinates      | `ghcr.io/degauss-org/geocoder:3.3.0`          |
+| 2    | Coordinates → FIPS         | `ghcr.io/degauss-org/census_block_group:0.6.0`|
+
+
+**DeGAUSS Docker Commands (Executed Internally):**
+```bash
+# Step 1: Get Coordinates from Address
+docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" ghcr.io/degauss-org/geocoder:3.3.0 /tmp/<your_preprocessed_input.csv> <threshold>
+
+# Step 2: Get FIPS from Coordinates
+docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" ghcr.io/degauss-org/census_block_group:0.6.0 /tmp/<your_coordinate_output.csv> <year>
+```
+
+Replace:
+- `ABS_OUTPUT_FOLDER` → absolute path to your output directory
+- `<threshold>` → numeric value (e.g. `0.7`)
+- `<year>` → either `2010` or `2020`
+
+
 ---
 
 ### **Case 2: OMOP Database Input**
@@ -192,37 +227,6 @@ OMOP_FIPS_result/
 │   └── latlong_with_fips.zip          # CSVs with FIPS from coordinates
 ├── invalid/                           # Usually empty; no usable location data
 ```
-
-### **Generate Census Tract (FIPS) Information**
-
-To convert patient location data into Census Tract identifiers (FIPS11), we use a two-step geocoding process powered by [DeGAUSS](https://degauss.org), executed locally via Docker containers.
-
-
-####  Method: DeGAUSS Toolkit (Docker-based)
-
-DeGAUSS consists of two Docker containers:
-1. **Geocoder (3.3.0)** — Converts address to latitude/longitude
-2. **Census Block Group (0.6.0)** — Converts latitude/longitude to Census Tract FIPS codes
-
-| Step | Purpose                   | Docker Image                                  |
-|------|----------------------------|-----------------------------------------------|
-| 1    | Address → Coordinates      | `ghcr.io/degauss-org/geocoder:3.3.0`          |
-| 2    | Coordinates → FIPS         | `ghcr.io/degauss-org/census_block_group:0.6.0`|
-
-
-**DeGAUSS Docker Commands (Executed Internally):**
-```bash
-# Step 1: Get Coordinates from Address
-docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" ghcr.io/degauss-org/geocoder:3.3.0 /tmp/<your_preprocessed_input.csv> <threshold>
-
-# Step 2: Get FIPS from Coordinates
-docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" ghcr.io/degauss-org/census_block_group:0.6.0 /tmp/<your_coordinate_output.csv> <year>
-```
-
-Replace:
-- `ABS_OUTPUT_FOLDER` → absolute path to your output directory
-- `<threshold>` → numeric value (e.g. `0.7`)
-- `<year>` → either `2010` or `2020`
 
 ---
 
