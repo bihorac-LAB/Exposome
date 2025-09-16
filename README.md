@@ -54,6 +54,8 @@ The web application is deployed at [HiPerGator](https://www.rc.ufl.edu/about/hip
 
 # Docker Run Commands for `exposome-geocoder-pipeline`
 
+[Walkthrough video on how to run](https://www.loom.com/share/90ee845b3fd94af398e17d91e4868abc?sid=fa19691e-f185-451c-bdb8-bbf3d8ff1bb3)
+
 ## Container Name:
 `omerkahveciuf/exposome-geocoder:1.0.1`
 
