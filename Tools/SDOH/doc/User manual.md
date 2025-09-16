@@ -1,6 +1,13 @@
 ## **User Manual: Geocoding Patient Data for SDoH Linkage**
-
 > **Note:** This manual does **not** require or share any PHI (Protected Health Information).
+
+### Appendix 
+- [Step1: Preparing Input Data](#step-1-preparing-input-data)
+- [Step 2: Get FIPS code](#step-2-get-fips-code)   
+- [Note on HOSPITAL_ADDRESSES Format](#note-on-hospital_addresses-format)  
+- [Generate Census Tract (FIPS) Information](#generate-census-tract-fips-information)  
+- [Case 2: OMOP Database Input](#case-2-omop-database-input)  
+- [Step 3: Linking with SDoH Data (Web Platform)](#step-3-linking-with-sdoh-data-web-platform)  
 
 ---
 
