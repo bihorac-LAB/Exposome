@@ -3,10 +3,9 @@
 
 ### Appendix 
 - [Step1: Preparing Input Data](#step-1-preparing-input-data)
-- [Step 2: Get FIPS code](#step-2-get-fips-code)   
-- [Note on HOSPITAL_ADDRESSES Format](#note-on-hospital_addresses-format)  
+- [Step 2: Get FIPS code](#step-2-get-fips-code)    
 - [Generate Census Tract (FIPS) Information](#generate-census-tract-fips-information)  
-- [Case 2: OMOP Database Input](#case-2-omop-database-input)  
+- [OMOP Database Input](#omop-database-input)  
 - [Step 3: Linking with SDoH Data (Web Platform)](#step-3-linking-with-sdoh-data-web-platform)  
 
 ---
@@ -189,7 +188,7 @@ Replace:
 
 ---
 
-### **Case 2: OMOP Database Input**
+### **OMOP Database Input**
 
 This workflow pulls patient location and visit data from OMOP CDM tables and classifies the records into 3 groups before geocoding:
 
