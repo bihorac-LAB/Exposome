@@ -2,7 +2,7 @@
 > **Note:** This manual does **not** require or share any PHI (Protected Health Information).
 
 ### Appendix 
-- [Step1: Preparing Input Data](#step-1-preparing-input-data)
+- [Step 1: Preparing Input Data](#step-1-preparing-input-data)
 - [Step 2: Get FIPS code](#step-2-get-fips-code)    
 - [Generate Census Tract (FIPS) Information](#generate-census-tract-fips-information)  
 - [OMOP Database Input](#omop-database-input)  
