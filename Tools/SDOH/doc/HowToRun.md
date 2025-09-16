@@ -1,7 +1,7 @@
 # Docker Run Commands for `exposome-geocoder-pipeline`
 
 ## Container Name:
-`omerkahveciuf/exposome-geocoder:1.0.1`
+`prismaplab/exposome-geocoder:1.0.2`
 
 ## Pre-requisite:
 - **docker Desktop** - make sure it is running.
@@ -21,7 +21,7 @@ docker run -it --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
-  omerkahveciuf/exposome-geocoder:1.0.1 \
+  prismaplab/exposome-geocoder:1.0.2 \
   /app/code/Address_to_FIPS.py -i <input_folder>
 ```
 Replace input_folder with the input folder storing your data.
@@ -33,7 +33,7 @@ docker run -it --rm \
   -v "$(pwd)":/workspace \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
-  omerkahveciuf/exposome-geocoder:1.0.1 \
+  prismaplab/exposome-geocoder:1.0.2 \
   /app/code/OMOP_to_FIPS.py \
     --user <your_username>\
     --password <your_password> \

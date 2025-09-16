@@ -57,7 +57,7 @@ The web application is deployed at [HiPerGator](https://www.rc.ufl.edu/about/hip
 [Walkthrough video on how to run](https://www.loom.com/share/90ee845b3fd94af398e17d91e4868abc?sid=fa19691e-f185-451c-bdb8-bbf3d8ff1bb3)
 
 ## Container Name:
-`omerkahveciuf/exposome-geocoder:1.0.1`
+`prismaplab/exposome-geocoder:1.0.2`
 
 ## Pre-requisite:
 - **docker Desktop** - make sure it is running.
@@ -77,7 +77,7 @@ docker run -it --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
-  omerkahveciuf/exposome-geocoder:1.0.1 \
+  prismaplabexposome-geocoder:1.0.2 \
   /app/code/Address_to_FIPS.py -i <input_folder>
 ```
 Replace input_folder with the input folder storing your data.
@@ -89,7 +89,7 @@ docker run -it --rm \
   -v "$(pwd)":/workspace \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
-  omerkahveciuf/exposome-geocoder:1.0.1 \
+  prismaplab/exposome-geocoder:1.0.2 \
   /app/code/OMOP_to_FIPS.py \
     --user <your_username>\
     --password <your_password> \
