@@ -17,8 +17,6 @@ We selected PostgreSQL database and GIS extension to fulfill our requests. Inspi
 
 * `data_source` table is used to store significant metadata from all source datasets includes SDoH datasets, environmental data and geomentry data. 
 
-[placeholder of a metadata table]
-
 * For each SDoH and environmental data, there are two tables generated
   - `variable_index table`, which is applied to record the important attributes /properties of each variable 
   - `variable_value table`, which is applied to store the values of the variable for each geocoded locations
