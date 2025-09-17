@@ -15,7 +15,7 @@ This repository provides a reproducible workflow to geocode patient location dat
   - [Step 1: Prepare Input Data](#step-1-prepare-input-data)  
   - [Step 2: Generate FIPS Codes](#step-2-generate-fips-codes)  
   - [Step 3: Output Structure](#step-3-output-structure)  
-  - [Step 4: Link with SDoH Web Platform](#step-4-link-with-sdoh-web-platform)  
+  - [Step 4: Link with Exposome Web Platform](#step-4-link-with-exposome-web-platform)  
 - [Appendix](#appendix)  
   - [Geocoding Workflow](#geocoding-workflow)  
   - [Script Highlights](#script-highlights)  
