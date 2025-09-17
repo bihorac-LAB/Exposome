@@ -40,7 +40,7 @@ To protect patient privacy, geocoding should be executed **locally**. Our toolki
 
 > If your institution already provides geocoding services, you may skip these toolkits.
 
-Detailed instructions are available [here](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/doc/UserManual.md).
+Detailed instructions are available [here](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/doc/UserManual.md).
 
 ### Demo Videos
 - [FIPS Generation](#)  
