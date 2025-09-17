@@ -219,7 +219,7 @@ Replace:
 
 ---
 
-### **Step 3: Linking with SDoH Data (Web Platform)**
+### **Step 4: Linking with SDoH Data (Web Platform)**
 
 1. **Register** on the web platform
 2. **Upload** your `*_with_fips.zip` from Step 2
