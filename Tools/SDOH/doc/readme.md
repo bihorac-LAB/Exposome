@@ -6,6 +6,24 @@ This repository provides a reproducible workflow to geocode patient location dat
 
 ---
 
+## 🚀 Quickstart
+
+For CSV input (addresses or coordinates):
+
+```bash
+docker run -it --rm \
+  -v "$(pwd)":/workspace \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e HOST_PWD="$(pwd)" \
+  -w /workspace \
+  prismaplab/exposome-geocoder:1.0.2 \
+  /app/code/Address_to_FIPS.py -i <input_folder>
+```
+- Replace `<input_folder>` with the path to your CSV folder.  
+- Outputs are saved in the `output/` directory.  
+- Upload the `*_with_fips.zip` file to [https://exposome.rc.ufl.edu](https://exposome.rc.ufl.edu) to link with Exposme datasets.
+---
+
 ## 📑 Table of Contents
 - [Step 1: Preparing Input Data](#step-1-preparing-input-data)
 - [Step 2: Get FIPS Code](#step-2-get-fips-code)
@@ -73,9 +91,62 @@ docker run -it --rm \
   -w /workspace \
   prismaplab/exposome-geocoder:1.0.2 \
   /app/code/Address_to_FIPS.py -i <input_folder>
+```
 
-Replace <input_folder> with the relative path to your input folder.
+### For OMOP Database (Option 3)
 
+```bash
+docker run -it --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$(pwd)":/workspace \
+  -e HOST_PWD="$(pwd)" \
+  -w /workspace \
+  prismaplab/exposome-geocoder:1.0.2 \
+  /app/code/OMOP_to_FIPS.py \
+    --user <your_username> \
+    --password <your_password> \
+    --server <server_address> \
+    --port <port_number> \
+    --database <database_name>
+```
+
+---
+
+## Step 3: Output Structure
+
+### For CSV Input (Option 1 & 2)
+- `<filename>_with_coordinates.csv` — input + latitude/longitude  
+- `<filename>_with_fips.csv` — input + FIPS codes  
+
+Packaged outputs:
+- `output/coordinates_from_address_<timestamp>.zip`
+- `output/geocoded_fips_codes_<timestamp>.zip`
+
+**Output Columns**
+
+| Column        | Description                                  |
+|---------------|----------------------------------------------|
+| Latitude      | Latitude from geocoder                       |
+| Longitude     | Longitude from geocoder                      |
+| geocode_result| Status: `geocoded` or `Imprecise Geocode`    |
+| reason        | Failure reason (e.g., missing street/ZIP)    |
+
+### For OMOP Input (Option 3)
+
+```
+OMOP_data/
+├── valid_address/               # Records with address, no lat/lon
+├── invalid_lat_lon_address/     # Records missing both address and lat/lon
+├── valid_lat_long/              # Records with lat/lon
+
+OMOP_FIPS_result/
+├── address/
+│   ├── address_with_coordinates.zip   # CSVs with lat/lon from address
+│   └── address_with_fips.zip          # CSVs with FIPS codes
+├── latlong/
+│   └── latlong_with_fips.zip          # CSVs with FIPS from coordinates
+├── invalid/                           # Usually empty; no usable location data
+```
 ---
 
 ## Step 4: Linking with SDoH Data (Web Platform)
@@ -110,3 +181,24 @@ docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" ghcr.io/degauss-org/geocoder:3.3.0 /
 
 # Step 2: Get FIPS
 docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" ghcr.io/degauss-org/census_block_group:0.6.0 /tmp/<your_coordinate_output.csv> <year>
+```
+
+- `ABS_OUTPUT_FOLDER` → absolute path to output directory  
+- `<threshold>` → match threshold (e.g., 0.7)  
+- `<year>` → 2010 or 2020  
+
+### Script Highlights
+
+**Address_to_FIPS.py**
+- Reads CSV
+- Normalizes address or uses lat/lon
+- Runs DeGAUSS (geocoder + census block group)
+- Packages outputs into ZIP
+
+**OMOP_to_FIPS.py**
+- Extracts OMOP CDM data
+- Categorizes records
+- Runs FIPS generation
+- Outputs compressed ZIP folders
+
+---
