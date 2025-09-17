@@ -122,37 +122,32 @@ All generated files are compressed into two separate ZIP archives for convenienc
 
 **Output Columns Description**
 
-| Column         | Description                          |
-|----------------|--------------------------------------|
-| `Latitude`     | Latitude from geocoder               |
-| `Longitude`    | Longitude from geocoder              |
-| `geocode_result` | Indicates the outcome of geocoding — `geocoded` for successful matches, `Imprecise Geocode` if it failed |
-| `reason`       | Failure reason if applicable         |
+| Column           | Description                                                                 |
+|------------------|-----------------------------------------------------------------------------|
+| `Latitude`       | Latitude returned from the geocoder                                         |
+| `Longitude`      | Longitude returned from the geocoder                                        |
+| `geocode_result` | Outcome of geocoding — `geocoded` for successful matches, `Imprecise Geocode` if not precise |
+| `reason`         | Failure reason if applicable (see [Reason Column Values](#reason-column-values)) |
 
-**reason Column Values** 
+## Reason Column Values
+Used when geocoding fails or is imprecise. Possible values include:
 
-Used when geocoding fails or is imprecise. Includes: 
+- **Hospital address given** – Detected from known hardcoded hospital addresses.  
+- **Street missing** – No street info provided.  
+- **Blank/Incomplete address** – Address is empty or has missing components.  
+- **Zip missing** – ZIP code not provided.  
 
-- `Hospital address given` – Detected from known hardcoded hospital addresses 
+> **Tip:** You can improve detection of hospital addresses by adding more known addresses into the hardcoded list in the script. Add them in `Address_to_FIPS.py` located at `Tools/SDOH/code/Address_to_FIPS.py`, just after importing all packages.
 
-- `Street missing` – No street info provided 
-
-- `Blank/Incomplete address` – Address is empty or has missing components 
-
-- `Zip missing` – ZIP code not provided 
-
-> Tip: You can improve detection of hospital addresses by adding more known addresses into the hardcoded list in the script. You add that to `Address_to_FIPS.py` at `Tools/SDOH/code/Address_to_FIPS.py` just after you import all the packages at the top of the file.
-
-> Name it `HOSPITAL_ADDRESSES`
-
-##### Note on HOSPITAL_ADDRESSES Format
+## Note on `HOSPITAL_ADDRESSES` Format
 
 When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FIPS.py`, ensure each address:
 
-- Is written as a full, single-line string.
-- Uses only lowercase letters and numbers.
-- Has no commas or special characters.
-- Fields are separated by single spaces.
+- Is written as a full, single-line string.  
+- Uses only lowercase letters and numbers.  
+- Has no commas or special characters.  
+- Fields are separated by single spaces.  
+---
 
 #### For Option 3
 
