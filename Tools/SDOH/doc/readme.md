@@ -72,20 +72,19 @@ You need to prepare **only ONE** of the following data elements per encounter.
 
 ---
 ## Usage
-## Step 1: Prepare Input Data
+
+### Step 1: Prepare Input Data
 You need to prepare **only ONE** of the data elements as indicated under the [Input Options](#input-options) per encounter.  
 For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your data in a **CSV file**.  
 - Place the CSV file(s) in a dedicated folder (e.g., `input_address/` or `input_coordinates/`).
 
-## Step 2: Generate FIPS Codes
+### Step 2: Generate FIPS Codes
 > Container: `prismaplab/exposome-geocoder:1.0.2`  
 > Ensure Docker Desktop is running.  
 > On Windows, run commands from WSL root.
 
-### CSV Input (Option 1 & 2)
-For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your data in a **CSV file**.  
-- Place the CSV file(s) in a dedicated folder (e.g., `input_address/` or `input_coordinates/`).  
-- Pass that folder as `<input_folder>` in the command below.  
+#### CSV Input (Option 1 & 2)
+- Pass your folder containing CSV files as `<input_folder>` in the command:
 
 ```bash
 docker run -it --rm \
@@ -130,10 +129,10 @@ docker run -it --rm \
 ```
 ---
 
-## Step 3: Output from Running the Docker Command
+### Step 3: Output from Running the Docker Command
 When you run the Docker command (for Option 1, 2, or 3), the pipeline generates a zipped file with the following structure:
 
-### CSV Input (Option 1 & 2)
+#### CSV Input (Option 1 & 2)
 Generated per file:
   - `<filename>_with_coordinates.csv` — input + latitude/longitude  
   - `<filename>_with_fips.csv` — input + FIPS codes  
@@ -153,7 +152,7 @@ Zipped outputs:
 | `geocode_result` | Outcome of geocoding — `geocoded` for successful matches, `Imprecise Geocode` if not precise |
 | `reason`         | Failure reason if applicable (see [Reason Column Values](#reason-column-values)) |
 
-#### Reason Column Values
+##### Reason Column Values
 Used when geocoding fails or is imprecise. Possible values include:
 
 - **Hospital address given** – Detected from known hardcoded hospital addresses.  
@@ -161,11 +160,10 @@ Used when geocoding fails or is imprecise. Possible values include:
 - **Blank/Incomplete address** – Address is empty or has missing components.  
 - **Zip missing** – ZIP code not provided.  
 
-#### **Tip: Improving Hospital Address Detection**
-> Define them under the variable HOSPITAL_ADDRESSES:
->    Add them in [`Address_to_FIPS.py`](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/Address_to_FIPS.py) just after importing all packages.
+##### Improving Hospital Address Detection
+> Tip: Improve hospital address detection by adding addresses under the variable HOSPITAL_ADDRESSES in [`Address_to_FIPS.py`](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/Address_to_FIPS.py) 
 
-##### Note on `HOSPITAL_ADDRESSES` Format
+###### Note on `HOSPITAL_ADDRESSES` Format
 
 When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FIPS.py`, ensure each address:
 
@@ -174,7 +172,7 @@ When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FI
 - Has no commas or special characters.  
 - Fields are separated by single spaces.  
 ---
-### OMOP Input (Option 3)
+#### OMOP Input (Option 3)
 
 ```
 OMOP_data/
@@ -192,8 +190,7 @@ OMOP_FIPS_result/
 ```
 ---
 
-## Step 4: Link with Exposome Web Platform
-
+### Step 4: Link with Exposome Web Platform
 1. Register at [https://exposome.rc.ufl.edu](https://exposome.rc.ufl.edu/)  
 2. Upload `*_with_fips.zip` file obtained from Step 3 
 3. Input CSV must contain:  
