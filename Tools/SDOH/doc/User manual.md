@@ -5,7 +5,7 @@
 - [Step 1: Preparing Input Data](#step-1-preparing-input-data)
 - [Step 2: Get FIPS code](#step-2-get-fips-code)     
 - [Step 3: Output Structure](#step-3-output-format-generated)
-- [Step 4: Linking with Exposome Data (Web Platform)](#step-4-linking-with-exposome-data-web-platform)
+- [Step 4: Linking with Exposome Data Web Platform](#step-4-linking-with-exposome-data-web-platform)
 - [How does the geocoding work?](#generate-census-tract-fips-information) )
 ---
 
