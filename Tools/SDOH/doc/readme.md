@@ -74,7 +74,8 @@ You need to prepare **only ONE** of the following data elements per encounter.
 ## 🚀 Usage
 ## Step 1: Prepare Input Data
 You need to prepare **only ONE** of the data elements as indicated under the [Input Options](#input-options) per encounter.  
-Place your input CSVs or ensure DB access for OMOP.
+For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your data in a **CSV file**.  
+- Place the CSV file(s) in a dedicated folder (e.g., `input_address/` or `input_coordinates/`).
 
 ## Step 2: Generate FIPS Codes
 > Container: `prismaplab/exposome-geocoder:1.0.2`  
