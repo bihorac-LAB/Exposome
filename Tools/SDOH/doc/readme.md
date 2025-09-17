@@ -75,7 +75,7 @@ The key geographic identifier is the **Census Tract (FIPS 11 code)**.
 ---
 ## 🚀 Usage
 ## Step 1: Prepare Input Data
-You need to prepare **only ONE** of the data elements as indicated under the Input Options section per encounter.  
+You need to prepare **only ONE** of the data elements as indicated under the [Input Options](#input-options) per encounter.  
 Place your input CSVs or ensure DB access for OMOP.
 
 ## Step 2: Generate FIPS Codes
