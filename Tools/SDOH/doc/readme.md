@@ -209,7 +209,7 @@ docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" \
 
 #### Script Highlights
 
-**Address_to_FIPS.py Logic**
+##### Address_to_FIPS.py Logic
 This script handles CSV-based input:
 - Reads CSV files
 - Normalizes address or uses lat/lon
@@ -218,7 +218,7 @@ This script handles CSV-based input:
      - FIPS codes(via `ghcr.io/degauss-org/census_block_group`)
 - Packages outputs into ZIP
 
-**OMOP_to_FIPS.py Logic**
+##### OMOP_to_FIPS.py Logic
 This script integrates directly with **OMOP CDM**: 
 - Extracts OMOP CDM data
 - Categorizes into valid/invalid address or coordinates
