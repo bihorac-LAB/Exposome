@@ -70,7 +70,7 @@ Container Name: `prismaplab/exposome-geocoder:1.0.2`
 
 > **Note:** For Windows systems, run the commands from WSL root 
 
-#### For csv files as input: 
+#### For csv files as input: (For Option 1, Option 2 - link it to the appropriate heading) 
 ```bash
 docker run -it --rm \
   -v "$(pwd)":/workspace \
@@ -82,7 +82,7 @@ docker run -it --rm \
 ```
 > Replace input_folder with the relative path to your input folder.
 
-##### For OMOP database as an input,  Run `OMOP_to_FIPS.py`:
+##### For OMOP database as an input: (For Option 3)
 ```bash
 docker run -it --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
@@ -100,11 +100,10 @@ docker run -it --rm \
 > Add your database credentials.
 
 ---
-
-**Output Structure**
+### **Step 3: Output Structure**
 
 Option 1, Option 2
-
+#### For csv files as input: (For Option 1, Option 2 - link it to the appropriate heading) 
 
 For each input file processed by the script, the following output files are generated:
 
@@ -158,6 +157,27 @@ When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FI
 - Has no commas or special characters.
 - Fields are separated by single spaces.
 
+#### For OMOP database as an input: (For Option 3)
+
+**OMOP_data/** (raw extracted records)
+```
+OMOP_data/
+├── valid_address/               # Records with address, no lat/lon
+├── invalid_lat_lon_address/     # Records missing both address and lat/lon
+├── valid_lat_long/              # Records with lat/lon
+```
+
+**OMOP_FIPS_result/** (geocoded results)
+```
+OMOP_FIPS_result/
+├── address/
+│   ├── address_with_coordinates.zip   # CSVs with lat/lon from address
+│   └── address_with_fips.zip          # CSVs with FIPS codes
+├── latlong/
+│   └── latlong_with_fips.zip          # CSVs with FIPS from coordinates
+├── invalid/                           # Usually empty; no usable location data
+```
+
 
 ### **Generate Census Tract (FIPS) Information**
 
@@ -195,26 +215,7 @@ Replace:
 
 ### **OMOP Database Input**
 
-### Verified Generated Output Structure
 
-**OMOP_data/** (raw extracted records)
-```
-OMOP_data/
-├── valid_address/               # Records with address, no lat/lon
-├── invalid_lat_lon_address/     # Records missing both address and lat/lon
-├── valid_lat_long/              # Records with lat/lon
-```
-
-**OMOP_FIPS_result/** (geocoded results)
-```
-OMOP_FIPS_result/
-├── address/
-│   ├── address_with_coordinates.zip   # CSVs with lat/lon from address
-│   └── address_with_fips.zip          # CSVs with FIPS codes
-├── latlong/
-│   └── latlong_with_fips.zip          # CSVs with FIPS from coordinates
-├── invalid/                           # Usually empty; no usable location data
-```
 
 ---
 
