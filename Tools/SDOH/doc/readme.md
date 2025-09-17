@@ -37,7 +37,6 @@ The backend uses [DeGAUSS](https://degauss.org) Docker containers for geocoding.
 ## Input Options
 
 You need to prepare **only ONE** of the following data elements per encounter.  
-The key geographic identifier is the **Census Tract (FIPS 11 code)**.
 
 ### Option 1: Address
 - **Format A: Multi-Column Address**
