@@ -228,5 +228,4 @@ This script integrates directly with **OMOP CDM**:
 - Categorizes into valid/invalid address or coordinates
 - Executes FIPS generation (same as CSV workflow) 
 - Packages outputs into ZIP
-- 
 ---
