@@ -21,7 +21,7 @@ This repository provides a reproducible workflow to geocode patient location dat
   - [Script Highlights](#script-highlights)  
 ---
 
-## 📌 Overview
+## Overview
 This toolkit links patient data to SDoH databases via Census Tract (FIPS-11) codes.  
 
 It supports:  
@@ -71,7 +71,7 @@ You need to prepare **only ONE** of the following data elements per encounter.
 | location_history   | entity_id, start_date, end_date                      |
 
 ---
-## 🚀 Usage
+## Usage
 ## Step 1: Prepare Input Data
 You need to prepare **only ONE** of the data elements as indicated under the [Input Options](#input-options) per encounter.  
 For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your data in a **CSV file**.  
