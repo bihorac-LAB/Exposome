@@ -19,7 +19,6 @@ This repository provides a reproducible workflow to geocode patient location dat
 - [Appendix](#appendix)  
   - [Geocoding Workflow](#geocoding-workflow)  
   - [Script Highlights](#script-highlights)  
-  - [Known Hospital Addresses](#known-hospital-addresses)  
 ---
 
 ## 📌 Overview
