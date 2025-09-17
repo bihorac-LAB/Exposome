@@ -33,7 +33,7 @@ Key design elements:
 
 Most SDoH datasets use Census Tract (FIPS) boundaries. To support investigators, we provide **toolkits** to geocode source addresses into coordinates or FIPS codes.  
 
-To protect patient privacy, geocoding should be executed **locally** using [DeGAUSS](https://degauss.org). The toolkit supports both:
+To protect patient privacy, geocoding should be executed **locally**. Our toolkit supports both:
 
 - CSV file input  
 - Direct extraction from OMOP CDM databases  
