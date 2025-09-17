@@ -34,6 +34,9 @@ We prepared the scripts for both file processing and fetch data directly from OM
 > If your institute already provides the geocoding service, please ignore the toolkit.
 
 Detailed execution instructions are recorded at [here](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/doc/UserManual.md)
+Demo videos
+ - [For fips generation]()
+ - [For exposome linkage to other datasets](https://www.loom.com/share/bc4097b0d3db4f8f9132a06a49c17e71?sid=ad9671c1-6535-4bc9-b893-7e917efbcf75)
 
 ## Web Application
 
