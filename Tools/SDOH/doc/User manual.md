@@ -68,7 +68,7 @@ Container Name: `prismaplab/exposome-geocoder:1.0.2`
 
 > **Note:** For Windows systems, run the commands from WSL root 
 
-#### Run on csv input files:
+#### For csv files as input: 
 ```bash
 docker run -it --rm \
   -v "$(pwd)":/workspace \
@@ -80,7 +80,7 @@ docker run -it --rm \
 ```
 > Replace input_folder with the relative path to your input folder.
 
-##### Run `OMOP_to_FIPS.py`:
+##### For OMOP database as an input,  Run `OMOP_to_FIPS.py`:
 ```bash
 docker run -it --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
