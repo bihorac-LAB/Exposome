@@ -149,7 +149,7 @@ OMOP_FIPS_result/
 ```
 ---
 
-## Step 4: Linking with SDoH Data (Web Platform)
+## Step 4: Linking with Exposome Data (Web Platform)
 
 1. Register at [https://exposome.rc.ufl.edu](https://exposome.rc.ufl.edu/)  
 2. Upload your `*_with_fips.zip` file  
@@ -157,8 +157,9 @@ OMOP_FIPS_result/
    - `person_id`  
    - `visit_occurrence_id`  
    - `year`  
-   - `FIPS`  
-4. Download linked dataset with SDoH variables
+   - `FIPS`
+4. Select the dataset you want to link it to
+6. Download linked dataset with SDoH variables
 
 ---
 
