@@ -146,7 +146,7 @@ Used when geocoding fails or is imprecise. Possible values include:
 > Define them under the variable HOSPITAL_ADDRESSES:
 >    Add them in `Address_to_FIPS.py` located at `Tools/SDOH/code/Address_to_FIPS.py`, just after importing all packages.
 
-## Note on `HOSPITAL_ADDRESSES` Format
+##### Note on `HOSPITAL_ADDRESSES` Format
 
 When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FIPS.py`, ensure each address:
 
