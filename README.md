@@ -91,3 +91,6 @@ For questions, feedback, or collaboration requests regarding this repository, pl
 
 Or you can submit an issue directly in this repository, and we will respond promptly.
 
+## License
+
+This repository is licensed under the MIT License. See [LICENSE](LICENSE) for details.
