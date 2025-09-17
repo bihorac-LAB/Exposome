@@ -23,6 +23,21 @@ docker run -it --rm \
 - Outputs are saved in the `output/` directory.  
 - Upload the `*_with_fips.zip` file to [https://exposome.rc.ufl.edu](https://exposome.rc.ufl.edu) to link with Exposme datasets.
 ---
+## 📑 Table of Contents
+- [Overview](#overview)  
+- [Input Options](#input-options)  
+  - [Option 1: Address](#option-1-address)  
+  - [Option 2: Coordinates](#option-2-coordinates)  
+  - [Option 3: OMOP CDM](#option-3-omop-cdm)  
+- [Usage](#usage)  
+  - [Step 1: Prepare Input Data](#step-1-prepare-input-data)  
+  - [Step 2: Generate FIPS Codes](#step-2-generate-fips-codes)  
+  - [Step 3: Output Structure](#step-3-output-structure)  
+  - [Step 4: Link with SDoH Web Platform](#step-4-link-with-sdoh-web-platform)  
+- [Appendix](#appendix)  
+  - [Geocoding Workflow](#geocoding-workflow)  
+  - [Script Highlights](#script-highlights)  
+  - [Known Hospital Addresses](#known-hospital-addresses)  
 
 ## 📑 Table of Contents
 - [Step 1: Preparing Input Data](#step-1-preparing-input-data)
@@ -35,6 +50,19 @@ docker run -it --rm \
 
 ---
 
+## 📌 Overview
+This toolkit links patient data to SDoH databases via Census Tract (FIPS-11) codes.  
+
+It supports:  
+- Address-based geocoding  
+- Latitude/Longitude geocoding  
+- Extraction from OMOP CDM databases  
+
+The backend uses [DeGAUSS](https://degauss.org) Docker containers for geocoding.
+
+---
+
+## Input Options
 ## Step 1: Preparing Input Data
 
 You need to prepare **only ONE** of the following data elements per encounter.  
@@ -119,8 +147,10 @@ docker run -it --rm \
 - `<filename>_with_fips.csv` — input + FIPS codes  
 
 Packaged outputs:
+> All generated files are compressed into two separate ZIP archives for convenience:
 - `output/coordinates_from_address_<timestamp>.zip`
 - `output/geocoded_fips_codes_<timestamp>.zip`
+> Note: <timestamp> is a datetime string indicating when the script was executed (e.g., 20250624_150230).
 
 **Output Columns**
 
@@ -193,13 +223,84 @@ docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" ghcr.io/degauss-org/census_block_gro
 **Address_to_FIPS.py**
 - Reads CSV
 - Normalizes address or uses lat/lon
-- Runs DeGAUSS (geocoder + census block group)
+- Runs DeGAUSS Docker container to get:
+     - Lat/lon (via ghcr.io/degauss-org/geocoder)
+     - FIPS (via ghcr.io/degauss-org/census_block_group)
 - Packages outputs into ZIP
 
 **OMOP_to_FIPS.py**
 - Extracts OMOP CDM data
-- Categorizes records
+- Categorizes into valid/invalid address or coordinates
 - Runs FIPS generation
 - Outputs compressed ZIP folders
 
 ---
+
+# Geocoding Preparation and Execution Guide
+
+This guide outlines the scripts, workflows, and Docker-based DeGAUSS toolkit used for generating Census Tract (FIPS) information from patient data.
+
+---
+
+## Generate Census Tract (FIPS) Information
+
+To convert patient location data into Census Tract identifiers (**FIPS11**), we use a two-step geocoding process powered by [DeGAUSS](https://degauss.org), executed locally via Docker containers.
+
+### Method: DeGAUSS Toolkit (Docker-based)
+
+DeGAUSS consists of two Docker containers:
+
+1. **Geocoder (3.3.0)** — Converts address to latitude/longitude  
+2. **Census Block Group (0.6.0)** — Converts latitude/longitude to Census Tract FIPS codes  
+
+| Step | Purpose                  | Docker Image                                     |
+|------|--------------------------|--------------------------------------------------|
+| 1    | Address → Coordinates    | `ghcr.io/degauss-org/geocoder:3.3.0`             |
+| 2    | Coordinates → FIPS       | `ghcr.io/degauss-org/census_block_group:0.6.0`   |
+
+---
+
+### DeGAUSS Docker Commands (Executed Internally)
+
+```bash
+# Step 1: Get Coordinates from Address
+docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" \
+  ghcr.io/degauss-org/geocoder:3.3.0 \
+  /tmp/<your_preprocessed_input.csv> <threshold>
+
+# Step 2: Get FIPS from Coordinates
+docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" \
+  ghcr.io/degauss-org/census_block_group:0.6.0 \
+  /tmp/<your_coordinate_output.csv> <year>
+```
+
+**Replace values:**
+- `ABS_OUTPUT_FOLDER` → absolute path to your output directory  
+- `<threshold>` → numeric value (e.g., `0.7`)  
+- `<year>` → either `2010` or `2020`  
+
+---
+
+## Appendix: Script Highlights
+
+### Address_to_FIPS.py Logic
+This script handles CSV-based input:  
+- Reads CSV files  
+- Normalizes addresses or uses lat/lon  
+- Runs DeGAUSS Docker containers to generate:  
+  - Latitude/Longitude (via `ghcr.io/degauss-org/geocoder`)  
+  - FIPS codes (via `ghcr.io/degauss-org/census_block_group`)  
+- Packages outputs into a compressed ZIP  
+
+---
+
+### OMOP_to_FIPS.py Logic
+This script integrates directly with **OMOP CDM**:  
+- Extracts data from OMOP CDM  
+- Categorizes into valid/invalid address or coordinates  
+- Executes FIPS generation (same as CSV workflow)  
+- Outputs compressed ZIP folders  
+
+---
+
+✅ This completes the geocoding preparation and execution guide for linking SDoH data.
