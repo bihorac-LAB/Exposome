@@ -38,9 +38,9 @@ Detailed execution instructions are recorded at [here](https://github.com/bihora
 ## Web Application
 
 We created a [web application](https://exposome.rc.ufl.edu/) to provide the investigators with the access to :
-- data catalog
+- Data catalog
 - Exposome data linkage tool
-- data visualization tool 
+- Data visualization tool 
 
 In the next release, we are planning to provide a basic data analyzer tool.
 
