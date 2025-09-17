@@ -48,7 +48,7 @@ Detailed instructions are available [here](https://github.com/bihorac-LAB/Exposo
 
 ---
 
-## Web Application
+### Web Application
 
 We developed a [web application](https://exposome.rc.ufl.edu/) that provides investigators with:
 
