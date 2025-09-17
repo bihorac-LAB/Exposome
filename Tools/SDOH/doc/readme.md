@@ -144,7 +144,7 @@ Used when geocoding fails or is imprecise. Possible values include:
 
 #### **Tip: Improving Hospital Address Detection**
 > Define them under the variable HOSPITAL_ADDRESSES:
->    Add them in `Address_to_FIPS.py`[https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/Address_to_FIPS.py] just after importing all packages.
+>    Add them in (`Address_to_FIPS.py`)[https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/Address_to_FIPS.py] just after importing all packages.
 
 ##### Note on `HOSPITAL_ADDRESSES` Format
 
