@@ -82,6 +82,9 @@ Place your input CSVs or ensure DB access for OMOP.
 > On Windows, run commands from WSL root.
 
 ### CSV Input (Option 1 & 2)
+For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your data in a **CSV file**.  
+- Place the CSV file(s) in a dedicated folder (e.g., `input_address/` or `input_coordinates/`).  
+- Pass that folder as `<input_folder>` in the command below.  
 
 ```bash
 docker run -it --rm \
@@ -92,6 +95,21 @@ docker run -it --rm \
   prismaplab/exposome-geocoder:1.0.2 \
   /app/code/Address_to_FIPS.py -i <input_folder>
 ```
+Example:
+
+If you have a file called patients_address.csv under input_address/, then run:
+
+```bash
+docker run -it --rm \
+  -v "$(pwd)":/workspace \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e HOST_PWD="$(pwd)" \
+  -w /workspace \
+  prismaplab/exposome-geocoder:1.0.2 \
+  /app/code/Address_to_FIPS.py -i input_address
+```
+⚠️ Note: Only .csv files are supported for Options 1 & 2. If your data is in Excel (.xlsx) or another format, please convert it to CSV before running the command.
+
 
 ### OMOP Input (Option 3)
 
