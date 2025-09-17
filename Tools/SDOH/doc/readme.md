@@ -130,7 +130,8 @@ docker run -it --rm \
 ```
 ---
 
-## Step 3: Output Structure
+## Step 3: Output from Running the Docker Command
+When you run the Docker command (for Option 1, 2, or 3), the pipeline generates a zipped file with the following structure:
 
 ### CSV Input (Option 1 & 2)
 Generated per file:
