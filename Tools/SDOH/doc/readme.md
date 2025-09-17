@@ -14,7 +14,7 @@ This repository provides a reproducible workflow to geocode patient location dat
 - [Usage](#usage)  
   - [Step 1: Prepare Input Data](#step-1-prepare-input-data)  
   - [Step 2: Generate FIPS Codes](#step-2-generate-fips-codes)  
-  - [Step 3: Output from Running Step 2](#step-3-output-structure)  
+  - [Step 3: Output from Step 2](#step-3-output-structure)  
   - [Step 4: Link with Exposome Web Platform](#step-4-link-with-exposome-web-platform)  
 - [Appendix](#appendix)  
   - [Geocoding Workflow](#geocoding-workflow)  
@@ -129,7 +129,7 @@ docker run -it --rm \
 ```
 ---
 
-### Step 3: Output from Running Step 2
+### Step 3: Output from Step 2
 When you run the Docker command (for Option 1, 2, or 3), the pipeline generates a zipped file with the following structure:
 
 #### CSV Input (Option 1 & 2)
