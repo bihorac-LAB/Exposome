@@ -1,8 +1,8 @@
-# Geocoding Patient Data for SDoH Linkage
+# Geocoding Patient Data for Exposome Linkage
 
 > **Note:** This toolkit does **not** require or share any Protected Health Information (PHI).
 
-This repository provides a reproducible workflow to geocode patient location data and generate Census Tract (FIPS 11-digit) identifiers for linking with Social Determinants of Health (SDoH) datasets.
+This repository provides a reproducible workflow to geocode patient location data and generate Census Tract (FIPS 11-digit) identifiers for linking with Exposome datasets.
 
 ---
 
@@ -73,3 +73,40 @@ docker run -it --rm \
   -w /workspace \
   prismaplab/exposome-geocoder:1.0.2 \
   /app/code/Address_to_FIPS.py -i <input_folder>
+
+Replace <input_folder> with the relative path to your input folder.
+
+---
+
+## Step 4: Linking with SDoH Data (Web Platform)
+
+1. Register at [https://exposome.rc.ufl.edu](https://exposome.rc.ufl.edu/)  
+2. Upload your `*_with_fips.zip` file  
+3. Input CSV must contain:  
+   - `person_id`  
+   - `visit_occurrence_id`  
+   - `year`  
+   - `FIPS`  
+4. Download linked dataset with SDoH variables
+
+---
+
+## Appendix
+
+### How Does Geocoding Work?
+
+The toolkit uses [DeGAUSS](https://degauss.org) with two Docker containers:
+
+| Step | Purpose                 | Docker Image                                  |
+|------|-------------------------|-----------------------------------------------|
+| 1    | Address → Coordinates   | `ghcr.io/degauss-org/geocoder:3.3.0`          |
+| 2    | Coordinates → FIPS      | `ghcr.io/degauss-org/census_block_group:0.6.0`|
+
+Example commands:
+
+```bash
+# Step 1: Get Coordinates
+docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" ghcr.io/degauss-org/geocoder:3.3.0 /tmp/<your_input.csv> <threshold>
+
+# Step 2: Get FIPS
+docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" ghcr.io/degauss-org/census_block_group:0.6.0 /tmp/<your_coordinate_output.csv> <year>
