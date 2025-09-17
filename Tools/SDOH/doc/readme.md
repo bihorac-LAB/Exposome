@@ -17,7 +17,7 @@ This repository provides a reproducible workflow to geocode patient location dat
   - [Step 3: Output Structure](#step-3-output-structure)  
   - [Step 4: Link with SDoH Web Platform](#step-4-link-with-sdoh-web-platform)  
 - [Appendix](#appendix)  
-  - [Geocoding Workflow](#geocoding-workflow)  
+  - [Geocoding Workflow (via DeGAUSS)](#geocoding-workflow)  
   - [Script Highlights](#script-highlights)  
   - [Known Hospital Addresses](#known-hospital-addresses)  
 ---
@@ -170,10 +170,6 @@ OMOP_FIPS_result/
 
 ### Geocoding Workflow (via DeGAUSS)
 This guide outlines the scripts, workflows, and Docker-based DeGAUSS toolkit used for generating Census Tract (FIPS) information from patient data.
-
----
-### Generate Census Tract (FIPS) Information
-
 To convert patient location data into Census Tract identifiers (**FIPS11**), we use a two-step geocoding process powered by [DeGAUSS](https://degauss.org), executed locally via Docker containers.
 
 #### Method: DeGAUSS Toolkit (Docker-based)
