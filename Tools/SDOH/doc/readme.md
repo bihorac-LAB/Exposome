@@ -230,7 +230,7 @@ docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" \
 #### Script Highlights
 
 ##### Address_to_FIPS.py Logic
-This script[https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/Address_to_FIPS.py] handles CSV-based input:
+This [script](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/Address_to_FIPS.py) handles CSV-based input:
 - Reads CSV files
 - Normalizes address or uses lat/lon
 - Runs DeGAUSS Docker container to generate:
@@ -239,7 +239,7 @@ This script[https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/Ad
 - Packages outputs into ZIP
 
 ##### OMOP_to_FIPS.py Logic
-This script[https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/OMOP_to_FIPS.py] integrates directly with **OMOP CDM**: 
+This [script](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/OMOP_to_FIPS.py) integrates directly with **OMOP CDM**: 
 - Extracts OMOP CDM data
 - Categorizes into valid/invalid address or coordinates
 - Executes FIPS generation (same as CSV workflow) 
