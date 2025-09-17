@@ -69,7 +69,7 @@ Container Name: `prismaplab/exposome-geocoder:1.0.2`
 
 > **Note:** For Windows systems, run the commands from WSL root 
 
-#### For csv files as input: (For Option 1, Option 2 - link it to the appropriate heading) 
+#### For csv files as input: (For [Option 1](#option-1-address-information), [Option 2](#option-2-coordinates)) 
 ```bash
 docker run -it --rm \
   -v "$(pwd)":/workspace \
@@ -81,7 +81,7 @@ docker run -it --rm \
 ```
 > Replace input_folder with the relative path to your input folder.
 
-##### For OMOP database as an input: (For Option 3)
+##### For OMOP database as an input: (For [Option 3](#option-3-omop))
 ```bash
 docker run -it --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
@@ -101,8 +101,7 @@ docker run -it --rm \
 ---
 ### **Step 3: Output Structure**
 
-Option 1, Option 2
-#### For Option 1, Option 2 - link it to the appropriate heading) 
+#### (For [Option 1](#option-1-address-information), [Option 2](#option-2-coordinates)) 
 
 For each input file processed by the script, the following output files are generated:
 
@@ -127,25 +126,11 @@ All generated files are compressed into two separate ZIP archives for convenienc
 | `Latitude`     | Latitude from geocoder               |
 | `Longitude`    | Longitude from geocoder              |
 | `geocode_result` | Indicates the outcome of geocoding — `geocoded` for successful matches, `Imprecise Geocode` if it failed |
-| `reason`       | Failure reason if applicable         |
+| `reason`       | Failure reason if applicable. Includes:<br>• `Hospital address given` – Detected from known hardcoded hospital addresses<br>• `Street missing` – No street info provided<br>• `Blank/Incomplete address` – Address is empty or has missing components<br>• `Zip missing` – ZIP code not provided
 
-**reason Column Values** 
+> Tip: You can improve detection of hospital addresses by adding more known addresses into the hardcoded list in the script. You add that to `Address_to_FIPS.py` at `Tools/SDOH/code/Address_to_FIPS.py` just after you import all the packages at the top of the file. Name it `HOSPITAL_ADDRESSES`
 
-Used when geocoding fails or is imprecise. Includes: 
-
-- `Hospital address given` – Detected from known hardcoded hospital addresses 
-
-- `Street missing` – No street info provided 
-
-- `Blank/Incomplete address` – Address is empty or has missing components 
-
-- `Zip missing` – ZIP code not provided 
-
-> Tip: You can improve detection of hospital addresses by adding more known addresses into the hardcoded list in the script. You add that to `Address_to_FIPS.py` at `Tools/SDOH/code/Address_to_FIPS.py` just after you import all the packages at the top of the file.
-
-> Name it `HOSPITAL_ADDRESSES`
-
-##### Note on HOSPITAL_ADDRESSES Format
+Note on HOSPITAL_ADDRESSES Format
 
 When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FIPS.py`, ensure each address:
 
