@@ -61,3 +61,33 @@ A basic data analysis tool will be included in the next release.
 The web application is deployed on [HiPerGator](https://www.rc.ufl.edu/about/hipergator/) PubApps.  
 
 ![External Investigator Workflow](./assets/External%20investigator%20workflow.png)
+
+# Contributing to Exposome Data Linkage Tool
+
+Thank you for your interest in contributing! To ensure smooth collaboration, please follow these guidelines:
+
+## How to Contribute
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/my-feature`).
+3. Commit your changes (`git commit -am 'Add new feature'`).
+4. Push to your branch (`git push origin feature/my-feature`).
+5. Open a Pull Request describing your changes.
+
+## Reporting Issues
+- Use the **Issues** tab for bug reports, feature requests, or questions.
+- Provide clear steps to reproduce any bugs and include any relevant screenshots or logs.
+
+## Coding Standards
+- Python scripts: PEP8 formatting
+- Markdown: Use proper headings and code blocks
+- Docker scripts: Ensure commands are tested and documented
+
+
+## Contact / Questions
+
+For questions, feedback, or collaboration requests regarding this repository, please reach out to:
+
+**prismap lab** – [ic3-center@ufl.edu](mailto:ic3-center@ufl.edu)  
+
+Or you can submit an issue directly in this repository, and we will respond promptly.
+
