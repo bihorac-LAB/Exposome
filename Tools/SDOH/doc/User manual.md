@@ -129,7 +129,7 @@ All generated files are compressed into two separate ZIP archives for convenienc
 | `geocode_result` | Outcome of geocoding — `geocoded` for successful matches, `Imprecise Geocode` if not precise |
 | `reason`         | Failure reason if applicable (see [Reason Column Values](#reason-column-values)) |
 
-### Reason Column Values
+#### Reason Column Values
 Used when geocoding fails or is imprecise. Possible values include:
 
 - **Hospital address given** – Detected from known hardcoded hospital addresses.  
@@ -137,7 +137,7 @@ Used when geocoding fails or is imprecise. Possible values include:
 - **Blank/Incomplete address** – Address is empty or has missing components.  
 - **Zip missing** – ZIP code not provided.  
 
-### **Tip: Improving Hospital Address Detection**
+#### **Tip: Improving Hospital Address Detection**
 > Define them under the variable HOSPITAL_ADDRESSES:
 >    Add them in `Address_to_FIPS.py` located at `Tools/SDOH/code/Address_to_FIPS.py`, just after importing all packages.
 
