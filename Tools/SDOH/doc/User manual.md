@@ -47,7 +47,7 @@ Records missing either field may result in imprecise geocode.
 | 30.353463 | -81.6749 |
 | 29.634219 | -82.3433 |
 
-#### **Option 3: OMOP 
+#### **Option 3: OMOP**
 
 This workflow pulls patient location and visit data from OMOP CDM tables and classifies the records into 3 groups before geocoding:
 
@@ -103,7 +103,7 @@ docker run -it --rm \
 ### **Step 3: Output Structure**
 
 Option 1, Option 2
-#### For csv files as input: (For Option 1, Option 2 - link it to the appropriate heading) 
+#### For Option 1, Option 2 - link it to the appropriate heading) 
 
 For each input file processed by the script, the following output files are generated:
 
@@ -121,7 +121,6 @@ All generated files are compressed into two separate ZIP archives for convenienc
 
 > Note: `<timestamp>` is a datetime string indicating when the script was executed (e.g., 20250624_150230).
 
-
 **Output Columns Description**
 
 | Column         | Description                          |
@@ -131,8 +130,7 @@ All generated files are compressed into two separate ZIP archives for convenienc
 | `geocode_result` | Indicates the outcome of geocoding — `geocoded` for successful matches, `Imprecise Geocode` if it failed |
 | `reason`       | Failure reason if applicable         |
 
-
-**reason Column Values**
+**reason Column Values** 
 
 Used when geocoding fails or is imprecise. Includes: 
 
@@ -148,7 +146,7 @@ Used when geocoding fails or is imprecise. Includes:
 
 > Name it `HOSPITAL_ADDRESSES`
 
-#### Note on HOSPITAL_ADDRESSES Format
+##### Note on HOSPITAL_ADDRESSES Format
 
 When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FIPS.py`, ensure each address:
 
@@ -157,7 +155,7 @@ When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FI
 - Has no commas or special characters.
 - Fields are separated by single spaces.
 
-#### For OMOP database as an input: (For Option 3)
+#### For Option 3
 
 **OMOP_data/** (raw extracted records)
 ```
@@ -178,11 +176,50 @@ OMOP_FIPS_result/
 ├── invalid/                           # Usually empty; no usable location data
 ```
 
+To know more about how the toolkit works, refer to the Appendix section here
+
+---
+
+### **Step 4: Linking with SDoH Data (Web Platform)**
+
+1. **Register** on the web platform [https://exposome.rc.ufl.edu/]
+2. **Upload** your `*_with_fips.zip` from Step 3
+3. **Input CSV Must Contain:**
+   - `person_id`
+   - `visit_occurrence_id`
+   - `year`
+   - `FIPS`
+4. **Result:**
+   - A fully linked dataset enriched with SDoH variables based on census tract and year
+   - Option to download the result as a CSV
+---
+
+### **Appendix: Script Highlights**
+
+#### **`Address_to_FIPS.py` Logic**
+- Reads CSV files
+- Normalizes address or uses lat/lon
+- Runs DeGAUSS Docker container to get:
+  - Lat/lon (via `ghcr.io/degauss-org/geocoder`)
+  - FIPS (via `ghcr.io/degauss-org/census_block_group`)
+- Packages outputs to ZIP
+
+#### **`OMOP_to_FIPS.py` Logic**
+- Extracts data from OMOP CDM
+- Categorizes into valid/invalid address or coordinates
+- Executes FIPS generation like CSV method
+- Outputs compressed ZIP folders
+
+---
+
+This completes the geocoding preparation and execution guide for linking SDoH data.
+
 
 ### **Generate Census Tract (FIPS) Information**
 
 To convert patient location data into Census Tract identifiers (FIPS11), we use a two-step geocoding process powered by [DeGAUSS](https://degauss.org), executed locally via Docker containers.
 
+Appendix:
 
 ####  Method: DeGAUSS Toolkit (Docker-based)
 
@@ -212,45 +249,3 @@ Replace:
 
 
 ---
-
-### **OMOP Database Input**
-
-
-
----
-
-### **Step 4: Linking with SDoH Data (Web Platform)**
-
-1. **Register** on the web platform
-2. **Upload** your `*_with_fips.zip` from Step 2
-3. **Input CSV Must Contain:**
-   - `person_id`
-   - `visit_occurrence_id`
-   - `year`
-   - `FIPS`
-
-4. **Result:**
-   - A fully linked dataset enriched with SDoH variables based on census tract and year
-   - Option to download the result as a CSV
-
----
-
-### **Appendix: Script Highlights**
-
-#### **`Address_to_FIPS.py` Logic**
-- Reads CSV files
-- Normalizes address or uses lat/lon
-- Runs DeGAUSS Docker container to get:
-  - Lat/lon (via `ghcr.io/degauss-org/geocoder`)
-  - FIPS (via `ghcr.io/degauss-org/census_block_group`)
-- Packages outputs to ZIP
-
-#### **`OMOP_to_FIPS.py` Logic**
-- Extracts data from OMOP CDM
-- Categorizes into valid/invalid address or coordinates
-- Executes FIPS generation like CSV method
-- Outputs compressed ZIP folders
-
----
-
-This completes the geocoding preparation and execution guide for linking SDoH data.
