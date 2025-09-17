@@ -5,24 +5,6 @@
 This repository provides a reproducible workflow to geocode patient location data and generate Census Tract (FIPS 11-digit) identifiers for linking with Exposome datasets.
 
 ---
-
-## 🚀 Quickstart
-
-For CSV input (addresses or coordinates):
-
-```bash
-docker run -it --rm \
-  -v "$(pwd)":/workspace \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -e HOST_PWD="$(pwd)" \
-  -w /workspace \
-  prismaplab/exposome-geocoder:1.0.2 \
-  /app/code/Address_to_FIPS.py -i <input_folder>
-```
-- Replace `<input_folder>` with the path to your CSV folder.  
-- Outputs are saved in the `output/` directory.  
-- Upload the `*_with_fips.zip` file to [https://exposome.rc.ufl.edu](https://exposome.rc.ufl.edu) to link with Exposme datasets.
----
 ## 📑 Table of Contents
 - [Overview](#overview)  
 - [Input Options](#input-options)  
