@@ -6,7 +6,7 @@ This repository provides a reproducible workflow to geocode patient location dat
 
 ---
 ## 📑 Table of Contents
-- [📌 Overview](#overview)  
+- [Overview](#overview)  
 - [Input Options](#input-options)  
   - [Option 1: Address](#option-1-address)  
   - [Option 2: Coordinates](#option-2-coordinates)  
