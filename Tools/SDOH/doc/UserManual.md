@@ -36,7 +36,7 @@ The backend uses [DeGAUSS](https://degauss.org) Docker containers for geocoding.
 ## Input Options
 
 You need to prepare **only ONE** of the following data elements per encounter.  
-
+Sample files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/SDOH/demo/address_files/input)
 ### Option 1: Address
 - **Format A: Multi-Column Address**
 
