@@ -47,16 +47,18 @@ Records missing either field may result in imprecise geocode.
 | 30.353463 | -81.6749 |
 | 29.634219 | -82.3433 |
 
-#### **Option 3: Census Tract (FIPS)**
-- Column: `FIPS`
-- Example:
+#### **Option 3: OMOP 
 
-| FIPS |
-|----------|
-| 12011080103 |
-| 12103026400 | 
+This workflow pulls patient location and visit data from OMOP CDM tables and classifies the records into 3 groups before geocoding:
 
-> If `FIPS` is available, skip Step 2.
+**Required Tables & Fields:**
+
+| Table              | Required Columns                                      |
+|--------------------|------------------------------------------------------|
+| `person`           | `person_id`                                          |
+| `visit_occurrence` | `visit_occurrence_id`, `visit_start_date`, `visit_end_date`, `person_id` |
+| `location`         | `location_id`, `address_1`, `city`, `state`, `zip`, `latitude`, `longitude` |
+| `location_history` | `entity_id`, `start_date`, `end_date`               |
 
 ---
 
@@ -100,6 +102,9 @@ docker run -it --rm \
 ---
 
 **Output Structure**
+
+Option 1, Option 2
+
 
 For each input file processed by the script, the following output files are generated:
 
@@ -189,29 +194,6 @@ Replace:
 ---
 
 ### **OMOP Database Input**
-
-This workflow pulls patient location and visit data from OMOP CDM tables and classifies the records into 3 groups before geocoding:
-
-**Required Tables & Fields:**
-
-| Table              | Required Columns                                      |
-|--------------------|------------------------------------------------------|
-| `person`           | `person_id`                                          |
-| `visit_occurrence` | `visit_occurrence_id`, `visit_start_date`, `visit_end_date`, `person_id` |
-| `location`         | `location_id`, `address_1`, `city`, `state`, `zip`, `latitude`, `longitude` |
-| `location_history` | `entity_id`, `start_date`, `end_date`               |
-
- **Required Input for the Python Script**:
-- `user`: username for the OMOP database
-- `password`: password for the OMOP databse
-- `server`: server number
-- `port`: port number
-- `database`: database name for OMOP
-
-**Run Script Example:**
-```bash
-python OMOP_to_FIPS.py --user <USERNAME> --password <PASSWORD> --server <HOST> --port <PORT> --database <DBNAME>
-```
 
 ### Verified Generated Output Structure
 
