@@ -125,15 +125,36 @@ Zipped outputs:
   - `output/geocoded_fips_codes_<timestamp>.zip`
 > Note: <timestamp> is a datetime string indicating when the script was executed (e.g., 20250624_150230).
 
-**Output Columns**
+**Output Columns Description**
 
-| Column        | Description                                  |
-|---------------|----------------------------------------------|
-| Latitude      | Latitude from geocoder                       |
-| Longitude     | Longitude from geocoder                      |
-| geocode_result| Status: `geocoded` or `Imprecise Geocode`    |
-| reason        | Failure reason (e.g., missing street/ZIP)    |
+| Column           | Description                                                                 |
+|------------------|-----------------------------------------------------------------------------|
+| `Latitude`       | Latitude returned from the geocoder                                         |
+| `Longitude`      | Longitude returned from the geocoder                                        |
+| `geocode_result` | Outcome of geocoding — `geocoded` for successful matches, `Imprecise Geocode` if not precise |
+| `reason`         | Failure reason if applicable (see [Reason Column Values](#reason-column-values)) |
 
+#### Reason Column Values
+Used when geocoding fails or is imprecise. Possible values include:
+
+- **Hospital address given** – Detected from known hardcoded hospital addresses.  
+- **Street missing** – No street info provided.  
+- **Blank/Incomplete address** – Address is empty or has missing components.  
+- **Zip missing** – ZIP code not provided.  
+
+#### **Tip: Improving Hospital Address Detection**
+> Define them under the variable HOSPITAL_ADDRESSES:
+>    Add them in `Address_to_FIPS.py` located at `Tools/SDOH/code/Address_to_FIPS.py`, just after importing all packages.
+
+## Note on `HOSPITAL_ADDRESSES` Format
+
+When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FIPS.py`, ensure each address:
+
+- Is written as a full, single-line string.  
+- Uses only lowercase letters and numbers.  
+- Has no commas or special characters.  
+- Fields are separated by single spaces.  
+---
 ### OMOP Input (Option 3)
 
 ```
