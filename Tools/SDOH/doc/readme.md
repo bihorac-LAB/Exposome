@@ -20,16 +20,6 @@ This repository provides a reproducible workflow to geocode patient location dat
   - [Geocoding Workflow](#geocoding-workflow)  
   - [Script Highlights](#script-highlights)  
   - [Known Hospital Addresses](#known-hospital-addresses)  
-
-## 📑 Table of Contents
-- [Step 1: Preparing Input Data](#step-1-preparing-input-data)
-- [Step 2: Get FIPS Code](#step-2-get-fips-code)
-- [Step 3: Output Structure](#step-3-output-structure)
-- [Step 4: Linking with Exposome Data (Web Platform)](#step-4-linking-with-exposome-data-web-platform)
-- [Appendix](#appendix)
-  - [How Does Geocoding Work?](#how-does-geocoding-work)
-  - [Script Highlights](#script-highlights)
-
 ---
 
 ## 📌 Overview
