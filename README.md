@@ -33,11 +33,11 @@ We prepared the scripts for both file processing and fetch data directly from OM
 
 > If your institute already provides the geocoding service, please ignore the toolkit.
 
-Detailed execution instructions are recorded at [here](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/doc/User%20manual.md)
+Detailed execution instructions are recorded at [here](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/doc/UserManual.md)
 
 ## Web Application
 
-We created a web application to provide the investigators with the access to :
+We created a [web application](https://exposome.rc.ufl.edu/) to provide the investigators with the access to :
 - data catalog
 - Exposome data linkage tool
 - data visualization tool 
