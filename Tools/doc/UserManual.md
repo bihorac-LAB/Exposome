@@ -3,7 +3,8 @@
 > **Note:** This toolkit does **not** require or share any Protected Health Information (PHI).
 
 This repository provides a reproducible workflow to geocode patient location data and generate Census Tract (FIPS 11-digit) identifiers for linking with Exposome datasets.
-A demo can be found [here](https://www.loom.com/share/603607c1365342cb9fb2303566f529cc?sid=81cab3db-8189-4ad4-b1fd-baca7a73bf25)
+
+> Demo video can be found [here](https://www.loom.com/share/603607c1365342cb9fb2303566f529cc?sid=81cab3db-8189-4ad4-b1fd-baca7a73bf25)
 ---
 ## 📑 Table of Contents
 - [Overview](#overview)  
