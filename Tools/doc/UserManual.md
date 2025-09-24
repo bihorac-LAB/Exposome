@@ -103,7 +103,7 @@ docker run -it --rm \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
   prismaplab/exposome-geocoder:1.0.2 \
-  /app/code/Address_to_FIPS.py -i <target_folder_path>
+  /app/code/Address_to_FIPS.py -i <input_folder_path>
 ```
 Example:
 
