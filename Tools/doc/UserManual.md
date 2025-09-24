@@ -95,6 +95,12 @@ For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your 
 - move your input folder to the WSL root `mv path_to_target_folder ~`
 - change directory to wsl root `cd ~`
 - Run the below command, providing the name of the target folder
+- After running the command, move the target folder back to the desired location
+  ```
+  cp -r target_folder_name /mnt/c/Users/<username>/Downloads/
+  rm -rf target_folder_name
+  ```
+  
 
 ```bash
 docker run -it --rm \
@@ -103,7 +109,7 @@ docker run -it --rm \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
   prismaplab/exposome-geocoder:1.0.2 \
-  /app/code/Address_to_FIPS.py -i <input_folder>
+  /app/code/Address_to_FIPS.py -i <target_folder_path>
 ```
 Example:
 
