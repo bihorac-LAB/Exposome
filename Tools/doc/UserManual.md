@@ -77,30 +77,24 @@ Sample files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/ma
 ### Step 1: Prepare Input Data
 You need to prepare **only ONE** of the data elements as indicated under the [Input Options](#input-options) per encounter.  
 For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your data in a **CSV file**.  
-- Place the CSV file(s) in a dedicated path (e.g., 📂`geocode/input_address/` or 📂`geocode/input_coordinates/`).
+- Place the CSV file(s) in a dedicated folder (e.g., 📂`input_address/` or 📂`input_coordinates/`).
 
 ### Step 2: Generate FIPS Codes
 > Container: `prismaplab/exposome-geocoder:1.0.2`  
 > Ensure Docker Desktop is running.  
-> On Windows, run commands from WSL.
+> On Windows, run commands from WSL. Makesure you have VSCode installed with the WSL extension.
 
 #### CSV Input (Option 1 & 2)
 
 > **If you are using Mac, Ubuntu, or any other Unix-based terminal:**
-- Run the below command in your terminal, providing the path to the folder just created (📂 geocode)
+- Run the below command in your terminal, providing the path to the input folder
 
 > **If you are using Windows, run the following commands:**
 - Open cmd or powershell
 - run command `wsl`
-- move your input folder to the WSL root `mv path_to_target_folder ~`
-- change directory to wsl root `cd ~`
-- Run the below command, providing the name of the target folder
-- After running the command, move the target folder back to the desired location
-  ```
-  cp -r target_folder_name /mnt/c/Users/<username>/Downloads/
-  rm -rf target_folder_name
-  ```
-  
+- Change directory to WSL root `cd ~`
+- Open VSCode workspace `code .` This opens the VS Code workspace in the current directory.
+- Add your input folder to the workspace and run the command below.
 
 ```bash
 docker run -it --rm \
@@ -113,7 +107,7 @@ docker run -it --rm \
 ```
 Example:
 
-If you have a file called patients_address.csv under 📂`geocode/input_address/`, then run:
+If you have a file called patients_address.csv under 📂`input_address/`, then run:
 
 ```bash
 docker run -it --rm \
@@ -122,7 +116,7 @@ docker run -it --rm \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
   prismaplab/exposome-geocoder:1.0.2 \
-  /app/code/Address_to_FIPS.py -i geocode/input_address
+  /app/code/Address_to_FIPS.py -i input_address
 ```
 ⚠️ Note: Only .csv files are supported for Options 1 & 2. If your data is in Excel (.xlsx) or another format, please convert it to CSV before running the command.
 
