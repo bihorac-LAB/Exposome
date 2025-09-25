@@ -37,7 +37,7 @@ The backend uses [DeGAUSS](https://degauss.org) Docker containers for geocoding.
 ## Input Options
 
 You need to prepare **only ONE** of the following data elements per encounter.  
-Sample files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/SDOH/demo/address_files/input)
+Sample files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/address_files/input)
 ### Option 1: Address
 - **Format A: Multi-Column Address**
 
@@ -171,7 +171,7 @@ Used when geocoding fails or is imprecise. Possible values include:
 - **Zip missing** – ZIP code not provided.  
 
 ##### Improving Hospital Address Detection
-> Tip: Improve hospital address detection by adding addresses under the variable HOSPITAL_ADDRESSES in [`Address_to_FIPS.py`](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/Address_to_FIPS.py) 
+> Tip: Improve hospital address detection by adding addresses under the variable HOSPITAL_ADDRESSES in [`Address_to_FIPS.py`](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/code/Address_to_FIPS.py) 
 
 ###### Note on `HOSPITAL_ADDRESSES` Format
 
@@ -256,7 +256,7 @@ docker run --rm -v "ABS_OUTPUT_FOLDER:/tmp" \
 #### Script Highlights
 
 ##### Address_to_FIPS.py Logic
-This [script](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/Address_to_FIPS.py) handles CSV-based input:
+This [script](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/code/Address_to_FIPS.py) handles CSV-based input:
 - Reads CSV files
 - Normalizes address or uses lat/lon
 - Runs DeGAUSS Docker container to generate:
@@ -265,7 +265,7 @@ This [script](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/
 - Packages outputs into ZIP
 
 ##### OMOP_to_FIPS.py Logic
-This [script](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/SDOH/code/OMOP_to_FIPS.py) integrates directly with **OMOP CDM**: 
+This [script](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/code/OMOP_to_FIPS.py) integrates directly with **OMOP CDM**: 
 - Extracts OMOP CDM data
 - Categorizes into valid/invalid address or coordinates
 - Executes FIPS generation (same as CSV workflow) 
