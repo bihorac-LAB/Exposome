@@ -10,6 +10,10 @@ import zipfile
 import shutil
 from datetime import datetime
 import gc
+import platform
+import shutil
+import re
+import shlex
 
 # -------------------------------------------------------------------
 # A quick-lookup set of FULL normalized hospital addresses.
@@ -116,13 +120,19 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
     host_folder = os.path.join(host_base, os.path.relpath(abs_output_folder, container_cwd))
     
     # Define the Docker command
+    # NOTE: binding a host directory onto container /tmp can break R's fifo() on
+    # certain host filesystem mounts (causes "cannot create fifo ... Operation not supported").
+    # To avoid this, mount the host folder into the container under /workspace
+    # so that the container's native /tmp remains usable for temporary files.
+    mount_dest = 'exposome_tmp'
     docker_command = [
         'docker', 'run', '--rm',
-        '-v', f'{host_folder}:/tmp',
+        '-v', f'{host_folder}:/workspace/{mount_dest}',
         'ghcr.io/degauss-org/geocoder:3.3.0',
-       f'/tmp/{os.path.basename(abs_preprocessed_file)}',
+       f'/workspace/{mount_dest}/{os.path.basename(abs_preprocessed_file)}',
         str(threshold)
     ]
+    logger.debug(f"Mounting host folder to container at /workspace/{mount_dest} instead of /tmp to preserve container /tmp semantics")
     
     try:
         result = subprocess.run(' '.join(docker_command), shell=True, check=True, capture_output=True, text=True)
@@ -274,7 +284,14 @@ def generate_fips_degauss(df, year, output_folder):
     # Calculate the relative path from the container's working directory
     host_folder = os.path.join(host_base, os.path.relpath(abs_output_folder, container_cwd))
     #output_file = f"{df.replace('.csv', '')}_census_block_group_0.6.0_{year}.csv"
-    docker_command2 = ["docker", "run", "--rm", "-v", f'{host_folder}:/tmp', "ghcr.io/degauss-org/census_block_group:0.6.0", f'/tmp/{os.path.basename(abs_preprocessed_file)}', str(year)]
+    mount_dest = 'exposome_tmp'
+    docker_command2 = [
+        "docker", "run", "--rm",
+        "-v", f'{host_folder}:/workspace/{mount_dest}',
+        "ghcr.io/degauss-org/census_block_group:0.6.0",
+        f'/workspace/{mount_dest}/{os.path.basename(abs_preprocessed_file)}', str(year)
+    ]
+    logger.debug(f"Mounting host folder to container at /workspace/{mount_dest} instead of /tmp to preserve container /tmp semantics")
     try:
         result = subprocess.run(docker_command2, check=True, capture_output=True, text=True)
         logger.info("Docker command executed successfully.")
@@ -405,13 +422,95 @@ def process_csv_file(file, input_folder, final_coordinate_files):
     return encounter_with_fips_file
 
         
+# Helper: detect native Windows with WSL available
+def _is_windows_with_wsl():
+    try:
+        if platform.system() != "Windows":
+            return False
+        # wsl.exe should be on PATH for WSL hosts
+        return shutil.which("wsl") is not None
+    except Exception:
+        return False
+
+# Helper: convert a Windows path like C:\Users\x to a WSL mount path /mnt/c/Users/x
+def _windows_to_mnt_path(win_path: str) -> str:
+    p = os.path.abspath(win_path).replace('\\', '/')
+    m = re.match(r'^([A-Za-z]):(.*)$', p)
+    if not m:
+        # not a drive-prefixed path; return path with forward slashes
+        return p
+    drive = m.group(1).lower()
+    rest = m.group(2)
+    # ensure leading slash on rest
+    if not rest.startswith('/'):
+        rest = '/' + rest
+    return f"/mnt/{drive}{rest}"
+
+# Helper: run a command inside WSL bash
+def _run_wsl_cmd(cmd: str, check: bool = True):
+    # Use bash -lc to ensure proper expansion
+    full = ["wsl", "-e", "bash", "-lc", cmd]
+    logger.info(f"Running on WSL: {cmd}")
+    try:
+        result = subprocess.run(full, check=check, capture_output=True, text=True)
+        logger.debug(result.stdout)
+        if result.stderr:
+            logger.debug(result.stderr)
+        return result
+    except subprocess.CalledProcessError as e:
+        logger.error(f"WSL command failed: {e}")
+        logger.error(e.stderr)
+        if check:
+            raise
+        return e
+
 def main():
     parser = argparse.ArgumentParser(description='FIPS Geocoding')
     parser.add_argument('-i', '--input', type=str, required=True, help='Input folder path containing CSV files')
     parser.add_argument('--debug', dest='debug', action='store_true', help='Enable debug logging')
-    
+    # allow disabling the WSL automation when desired
+    parser.add_argument('--no-wsl-auto', dest='no_wsl_auto', action='store_true', help='Do not perform automatic WSL orchestration on native Windows')
+
     args = parser.parse_args()
     input_folder = args.input
+
+    # If running on native Windows and WSL is present, orchestrate the WSL copy + docker-run + copy-back
+    if _is_windows_with_wsl() and not args.no_wsl_auto:
+        try:
+            win_input_abs = os.path.abspath(input_folder)
+            # Create a unique folder name in WSL home to avoid clobbering
+            timestamp_short = datetime.now().strftime('%Y%m%d%H%M%S')
+            wsl_input_basename = f"input_{timestamp_short}"
+            wsl_input_path = f"~/{wsl_input_basename}"
+
+            # Convert Windows input absolute path to WSL /mnt/ path
+            wsl_source_dir = _windows_to_mnt_path(win_input_abs)
+
+            # 1) create WSL input dir and copy CSVs into it
+            copy_cmd = f"mkdir -p {wsl_input_path} && cp -v {shlex.quote(wsl_source_dir)}/*.csv {wsl_input_path} || true"
+            _run_wsl_cmd(copy_cmd)
+
+            # 2) run the Docker container inside WSL mounting the WSL home dir (so the container will see the input folder)
+            docker_cmd = (
+                f"cd ~ && docker run -it --rm -v \"$(pwd)\":/workspace -v /var/run/docker.sock:/var/run/docker.sock "
+                f"-e HOST_PWD=\"$(pwd)\" -w /workspace prismaplab/exposome-geocoder:1.0.2 "
+                f"/app/code/Address_to_FIPS.py -i {wsl_input_basename}"
+            )
+            _run_wsl_cmd(docker_cmd)
+
+            # 3) copy output zip files back from WSL output folder to original Windows working directory
+            win_cwd = os.path.abspath(os.getcwd())
+            wsl_target_mnt = _windows_to_mnt_path(win_cwd)
+            copy_back_cmd = f"mkdir -p {shlex.quote(wsl_target_mnt)} && cp -v ~/output/*.zip {shlex.quote(wsl_target_mnt)}/ || true"
+            _run_wsl_cmd(copy_back_cmd)
+
+            logger.info("WSL orchestration complete; outputs copied back to Windows working directory.")
+            return
+        except Exception as e:
+            logger.exception(f"Automatic WSL orchestration failed: {e}")
+            logger.warning("Falling back to normal execution path.")
+
+    # If we reach here, either not Windows+WSL or WSL automation disabled/failed — continue normal, cross-platform code
     parent_folder = os.path.dirname(input_folder)
     output_folder = os.path.join(parent_folder, "output")
 
