@@ -80,7 +80,7 @@ For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your 
 - Place the CSV file(s) in a dedicated folder (e.g., 📂`input_address/` or 📂`input_coordinates/`).
 
 ### Step 2: Generate FIPS Codes
-> Container: `prismaplab/exposome-geocoder:1.0.2`  
+> Container: `prismaplab/exposome-geocoder:1.0.3`  
 > Ensure Docker Desktop is running.  
 > On Windows, run commands from WSL. Makesure you have VSCode installed with the WSL extension.
 
@@ -92,9 +92,7 @@ For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your 
 > **If you are using Windows, run the following commands:**
 - Open cmd or powershell
 - run command `wsl`
-- Change directory to WSL root `cd ~`
-- Open VSCode workspace `code .` This opens the VS Code workspace in the current directory.
-- Add your input folder to the workspace and run the command below.
+- Run the below command in your `wsl` terminal, providing the path to the input folder
 
 ```bash
 docker run -it --rm \
@@ -102,7 +100,7 @@ docker run -it --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
-  prismaplab/exposome-geocoder:1.0.2 \
+  prismaplab/exposome-geocoder:1.0.3 \
   /app/code/Address_to_FIPS.py -i <input_folder_path>
 ```
 Example:
@@ -115,7 +113,7 @@ docker run -it --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
-  prismaplab/exposome-geocoder:1.0.2 \
+  prismaplab/exposome-geocoder:1.0.3 \
   /app/code/Address_to_FIPS.py -i input_address
 ```
 ⚠️ Note: Only .csv files are supported for Options 1 & 2. If your data is in Excel (.xlsx) or another format, please convert it to CSV before running the command.
@@ -129,7 +127,7 @@ docker run -it --rm \
   -v "$(pwd)":/workspace \
   -e HOST_PWD="$(pwd)" \
   -w /workspace \
-  prismaplab/exposome-geocoder:1.0.2 \
+  prismaplab/exposome-geocoder:1.0.3 \
   /app/code/OMOP_to_FIPS.py \
     --user <your_username> \
     --password <your_password> \
