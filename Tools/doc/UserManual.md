@@ -7,19 +7,32 @@ This repository provides a reproducible workflow to geocode patient location dat
 > Demo video can be found [here](https://www.loom.com/share/603607c1365342cb9fb2303566f529cc?sid=81cab3db-8189-4ad4-b1fd-baca7a73bf25)
 ---
 ## 📑 Table of Contents
-- [Overview](#overview)  
-- [Input Options](#input-options)  
-  - [Option 1: Address](#option-1-address)  
-  - [Option 2: Coordinates](#option-2-coordinates)  
-  - [Option 3: OMOP CDM](#option-3-omop-cdm)  
-- [Usage](#usage)  
-  - [Step 1: Prepare Input Data](#step-1-prepare-input-data)  
-  - [Step 2: Generate FIPS Codes](#step-2-generate-fips-codes)  
-  - [Step 3: Output Structure](#step-3-output-structure)  
-  - [Step 4: Link with Exposome Web Platform](#step-4-link-with-exposome-web-platform)  
-- [Appendix](#appendix)  
-  - [Geocoding Workflow](#geocoding-workflow)  
-  - [Script Highlights](#script-highlights)  
+- [Geocoding Patient Data for Exposome Linkage](#geocoding-patient-data-for-exposome-linkage)
+  - [📑 Table of Contents](#-table-of-contents)
+  - [Overview](#overview)
+  - [Input Options](#input-options)
+    - [Option 1: Address](#option-1-address)
+    - [Option 2: Coordinates](#option-2-coordinates)
+    - [Option 3: OMOP CDM](#option-3-omop-cdm)
+  - [Usage](#usage)
+    - [Step 1: Prepare Input Data](#step-1-prepare-input-data)
+    - [Step 2: Generate FIPS Codes](#step-2-generate-fips-codes)
+      - [CSV Input (Option 1 \& 2)](#csv-input-option-1--2)
+    - [OMOP Input (Option 3)](#omop-input-option-3)
+    - [Step 3: Output Structure](#step-3-output-structure)
+      - [CSV Input (Option 1 \& 2)](#csv-input-option-1--2-1)
+        - [Reason Column Values](#reason-column-values)
+        - [Improving Hospital Address Detection](#improving-hospital-address-detection)
+          - [Note on `HOSPITAL_ADDRESSES` Format](#note-on-hospital_addresses-format)
+      - [OMOP Input (Option 3)](#omop-input-option-3-1)
+    - [Step 4: Link with Exposome Web Platform](#step-4-link-with-exposome-web-platform)
+  - [Appendix](#appendix)
+    - [Geocoding Workflow](#geocoding-workflow)
+      - [Method: DeGAUSS Toolkit (Docker-based)](#method-degauss-toolkit-docker-based)
+      - [DeGAUSS Docker Commands (Executed Internally)](#degauss-docker-commands-executed-internally)
+      - [Script Highlights](#script-highlights)
+        - [Address\_to\_FIPS.py Logic](#address_to_fipspy-logic)
+        - [OMOP\_to\_FIPS.py Logic](#omop_to_fipspy-logic)
 ---
 
 ## Overview
@@ -41,17 +54,17 @@ Sample files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/ma
 ### Option 1: Address
 - **Format A: Multi-Column Address**
 
-| street       | city        | state | zip   |
-|--------------|------------|-------|-------|
-| 1250 W 16th St | Jacksonville | FL    | 32209 |
-| 2001 SW 16th St | Gainesville  | FL    | 32608 |
+| street           | city         | state | zip   | year | person_deid_id |
+|------------------|--------------|-------|-------|------|----------------|
+| 1250 W 16th St   | Jacksonville | FL    | 32209 | 2019 | 1              |
+| 2001 SW 16th St  | Gainesville  | FL    | 32608 | 2019 | 2              |
 
 - **Format B: Single Column Address**
 
-| address |
-|---------|
-| 1250 W 16th St Jacksonville FL 32209 |
-| 2001 SW 16th St Gainesville FL 32608 |
+| address                                      | year | person_deid_id |
+|----------------------------------------------|------|----------------|
+| 1250 W 16th St Jacksonville FL 32209         | 2019 | 1              |
+| 2001 SW 16th St Gainesville FL 32608         | 2019 | 2              |
 
 > **Tip:** Street **and** ZIP are required. Missing fields may result in imprecise geocoding.
 
