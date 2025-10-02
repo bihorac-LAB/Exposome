@@ -294,23 +294,31 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
     preprocessed_file_path = os.path.join(output_folder, 'preprocessed_1.csv')
     df.to_csv(preprocessed_file_path, index=False)
 
+    if os.path.exists(preprocessed_file_path):
+        logger.info(f"Preprocessed file created: {preprocessed_file_path}")
+    else:
+        logger.error(f"Failed to create preprocessed file: {preprocessed_file_path}")
+        return os.path.abspath(output_file_name)  # Return early if file not created
+
     # Convert the folder and file paths to absolute paths for Docker
     abs_output_folder = os.path.abspath(output_folder)  # Convert to absolute path
-    abs_preprocessed_file = os.path.abspath(preprocessed_file_path) 
+    abs_preprocessed_file = os.path.abspath(preprocessed_file_path).replace("\\", "/")
 
-    container_cwd = os.getcwd()  # This will be /workspace when using -w /workspace
+    # Fixed: Changed Docker mounting strategy from /tmp to /workspace for consistent volume mounting
+    # and use string slicing to avoid case sensitivity issues in path replacement for Docker container
+    host_base_unix = host_base.replace("\\", "/")
+    container_input_path = '/workspace' + abs_preprocessed_file[len(host_base_unix):]
 
-    # Calculate the relative path from the container's working directory
-    host_folder = os.path.join(host_base, os.path.relpath(abs_output_folder, container_cwd))
-
-   # Define the Docker command
+    # Define the Docker command
+    # NOTE: Mount the host workspace to allow the geocoder container to access the input file.
     docker_command = [
         'docker', 'run', '--rm',
-        '-v', f'{host_folder}:/tmp',
+        '-v', f'{host_base}:/workspace',
         'ghcr.io/degauss-org/geocoder:3.3.0',
-       f'/tmp/{os.path.basename(abs_preprocessed_file)}',
+       container_input_path,
         str(threshold)
     ]
+    logger.debug(f"Using container path {container_input_path} with /workspace mount for geocoder access")
 
     # ADD DEBUG PRINTS HERE - RIGHT BEFORE EXECUTION
     print(f'abs_preprocessed_file: {abs_preprocessed_file}')
@@ -373,12 +381,20 @@ def generate_fips_degauss(df, year, output_folder):
     
     output_file = os.path.join(output_folder, f"preprocessed_2_census_block_group_0.6.0_{year}.csv")    
 
-    container_cwd = os.getcwd()  # This will be /workspace when using -w /workspace
-
-    # Calculate the relative path from the container's working directory
-    host_folder = os.path.join(host_base, os.path.relpath(abs_output_folder, container_cwd))
-#     output_file = f"{df.replace('.csv', '')}_census_block_group_0.6.0_{year}.csv"
-    docker_command2 = ["docker", "run", "--rm", "-v", f'{host_folder}:/tmp', "ghcr.io/degauss-org/census_block_group:0.6.0", f'/tmp/{os.path.basename(abs_preprocessed_file)}', str(year)]
+    # Fixed: Changed Docker mounting strategy from /tmp to /workspace for consistent volume mounting
+    # and use string slicing to avoid case sensitivity issues in path replacement for Docker container
+    host_base_unix = host_base.replace("\\", "/")
+    container_input_path = '/workspace' + abs_preprocessed_file[len(host_base_unix):]
+    # output_file = f"{df.replace('.csv', '')}_census_block_group_0.6.0_{year}.csv"
+    # Define the Docker command
+    # NOTE: Mount the host workspace to allow the census container to access the input file.
+    docker_command2 = [
+        "docker", "run", "--rm",
+        "-v", f"{host_base}:/workspace",
+        "ghcr.io/degauss-org/census_block_group:0.6.0",
+        container_input_path, str(year)
+    ]
+    logger.debug(f"Using container path {container_input_path} with /workspace mount for census access")
     try:
         result = subprocess.run(docker_command2, check=True, capture_output=True, text=True)
         logger.info("Docker command executed successfully.")
