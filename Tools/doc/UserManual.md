@@ -42,6 +42,7 @@ It supports:
 - Address-based geocoding  
 - Latitude/Longitude geocoding  
 - Extraction from OMOP CDM databases  
+- OMOP table CSVs (LOCATION.csv and LOCATION_HISTORY.csv)
 
 The backend uses [DeGAUSS](https://degauss.org) Docker containers for geocoding.
 
@@ -54,14 +55,14 @@ Sample files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/ma
 ### Option 1: Address
 - **Format A: Multi-Column Address**
 
-| street           | city         | state | zip   | year | person_deid_id |
+| street           | city         | state | zip   | year | entity_id |
 |------------------|--------------|-------|-------|------|----------------|
 | 1250 W 16th St   | Jacksonville | FL    | 32209 | 2019 | 1              |
 | 2001 SW 16th St  | Gainesville  | FL    | 32608 | 2019 | 2              |
 
 - **Format B: Single Column Address**
 
-| address                                      | year | person_deid_id |
+| address                                      | year | entity_id |
 |----------------------------------------------|------|----------------|
 | 1250 W 16th St Jacksonville FL 32209         | 2019 | 1              |
 | 2001 SW 16th St Gainesville FL 32608         | 2019 | 2              |
@@ -84,6 +85,24 @@ Sample files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/ma
 | location           | location_id, address_1, city, state, zip, latitude, longitude |
 | location_history   | entity_id, start_date, end_date                      |
 
+### Option 4: OMOP Tables (CSV Format)
+
+Optionally, you can include the following CSV files in the input folder to process OMOP table data:
+
+- **LOCATION.csv**
+
+| location_id | address_1 | address_2 | city | state | zip | county | location_source_value | country_concept_id | country_source_value | latitude | longitude |
+|-------------|-----------|-----------|------|-------|-----|--------|----------------------|-------------------|---------------------|----------|-----------|
+| 1           | 1248 N Blackstone Ave | | FRESNO | CA | 93703 | | UNITED STATES OF AMERICA | | UNITED STATES OF AMERICA | 36.75891146 | -119.7902719 |
+
+- **LOCATION_HISTORY.csv**
+
+| location_id | relationship_type_concept_id | domain_id | entity_id | start_date | end_date |
+|-------------|------------------------------|-----------|-----------|------------|----------|
+| 1           | 32848                        | 1147314   | 3763      | 1998-01-01 | 2020-01-01 |
+
+These files will be validated for required columns, and LOCATION.csv will be updated with FIPS codes if latitude/longitude are present or generated from addresses.
+
 ---
 ## Usage
 
@@ -91,6 +110,7 @@ Sample files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/ma
 You need to prepare **only ONE** of the data elements as indicated under the [Input Options](#input-options) per encounter.  
 For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your data in a **CSV file**.  
 - Place the CSV file(s) in a dedicated folder (e.g., 📂`input_address/` or 📂`input_coordinates/`).
+- Optionally, include `LOCATION.csv` and `LOCATION_HISTORY.csv` files as per Option 4 for OMOP table processing.
 
 ### Step 2: Generate FIPS Codes
 > Container: `prismaplab/exposome-geocoder:1.0.3`  
@@ -159,10 +179,12 @@ Generated per file:
   - `<filename>_with_fips.csv` — input + FIPS codes  
 
 Zipped outputs:
-> All generated files are compressed into two separate ZIP archives for convenience:
+- All generated files are compressed into two separate ZIP archives for convenience:
   - `output/coordinates_from_address_<timestamp>.zip`
   - `output/geocoded_fips_codes_<timestamp>.zip`
-> Note: <timestamp> is a datetime string indicating when the script was executed (e.g., 20250624_150230).
+- Note: `<timestamp>` is a datetime string indicating when the script was executed (e.g., 20250624_150230).
+
+If `LOCATION.csv` is provided, it will be updated with FIPS codes and saved as `LOCATION.csv` in the output folder. `LOCATION_HISTORY.csv` will be copied unchanged to the output folder. These files are not included in the zip archives.
 
 **Output Columns Description**
 
