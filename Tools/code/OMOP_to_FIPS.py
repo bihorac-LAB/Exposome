@@ -81,55 +81,55 @@ def omop_extraction(user, password, server, port, database):
         'Latlong': """
             WITH patient AS (
                 SELECT p.person_id, v.visit_occurrence_id, v.visit_start_date, v.visit_end_date
-                FROM CDM.PERSON p
-                LEFT JOIN CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
+                FROM CDM.PERSON_CHORUS p
+                LEFT JOIN CDM.VISIT_OCCURRENCE_CHORUS v ON p.person_id = v.person_id),
             address AS (
-                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
-                FROM CDM.LOCATION L LEFT JOIN CDM.LOCATION_HISTORY LS ON L.location_id = LS.location_id)
-            SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address_1, city, state, zip, latitude, longitude
+                SELECT entity_id, L.location_id, L.address_1, L.address_2, L.city, L.state, L.zip, L.county, L.location_source_value, L.country_concept_id, L.country_source_value, L.latitude, L.longitude, LS.start_date, LS.end_date
+                FROM CDM.LOCATION_DEMO L LEFT JOIN CDM.LOCATION_HISTORY_DEMO LS ON L.location_id = LS.location_id)
+            SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address.location_id, address.address_1, address.address_2, address.city, address.state, address.zip, address.county, address.location_source_value, address.country_concept_id, address.country_source_value, address.latitude, address.longitude
             FROM patient p
-            LEFT JOIN address a ON p.person_id = a.entity_id
-            WHERE p.visit_start_date BETWEEN a.start_date AND a.end_date
-              AND p.visit_end_date BETWEEN a.start_date AND a.end_date
+            LEFT JOIN address ON p.person_id = address.entity_id
+            WHERE p.visit_start_date BETWEEN address.start_date AND address.end_date
+              AND p.visit_end_date BETWEEN address.start_date AND address.end_date
               AND visit_start_date >= '2012-01-01'
-              AND NOT (LTRIM(RTRIM(ISNULL(a.latitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))
-              AND NOT (LTRIM(RTRIM(ISNULL(a.longitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))""",
+              AND NOT (LTRIM(RTRIM(ISNULL(address.latitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))
+              AND NOT (LTRIM(RTRIM(ISNULL(address.longitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))""",
         
         'Invalid': """
             WITH patient AS (
                 SELECT p.person_id, v.visit_occurrence_id, YEAR(v.visit_start_date) AS year
-                FROM CDM.PERSON p
-                LEFT JOIN CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
+                FROM CDM.PERSON_CHORUS p
+                LEFT JOIN CDM.VISIT_OCCURRENCE_CHORUS v ON p.person_id = v.person_id),
             address AS (
-                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
-                FROM CDM.LOCATION L LEFT JOIN CDM.LOCATION_HISTORY LS ON L.location_id = LS.location_id)
-            SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address_1, city, state, zip, latitude, longitude
+                SELECT entity_id, L.location_id, L.address_1, L.address_2, L.city, L.state, L.zip, L.county, L.location_source_value, L.country_concept_id, L.country_source_value, L.latitude, L.longitude, LS.start_date, LS.end_date
+                FROM CDM.LOCATION_DEMO L LEFT JOIN CDM.LOCATION_HISTORY_DEMO LS ON L.location_id = LS.location_id)
+            SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address.location_id, address.address_1, address.address_2, address.city, address.state, address.zip, address.county, address.location_source_value, address.country_concept_id, address.country_source_value, address.latitude, address.longitude
             FROM patient p
-            LEFT JOIN address a ON p.person_id = a.entity_id
-            WHERE p.visit_start_date BETWEEN a.start_date AND a.end_date
-              AND p.visit_end_date BETWEEN a.start_date AND a.end_date
+            LEFT JOIN address ON p.person_id = address.entity_id
+            WHERE p.visit_start_date BETWEEN address.start_date AND address.end_date
+              AND p.visit_end_date BETWEEN address.start_date AND address.end_date
               AND visit_start_date >= '2012-01-01'
-              AND (LTRIM(RTRIM(ISNULL(a.latitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))
-              AND (LTRIM(RTRIM(ISNULL(a.longitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))
-              AND (LTRIM(RTRIM(ISNULL(a.address_1, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))""",
+              AND (LTRIM(RTRIM(ISNULL(address.latitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))
+              AND (LTRIM(RTRIM(ISNULL(address.longitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))
+              AND (LTRIM(RTRIM(ISNULL(address.address_1, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))""",
 
         'Address': """
             WITH patient AS (
                 SELECT p.person_id, v.visit_occurrence_id, YEAR(v.visit_start_date) AS year
-                FROM CDM.PERSON p
-                LEFT JOIN CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
+                FROM CDM.PERSON_CHORUS p
+                LEFT JOIN CDM.VISIT_OCCURRENCE_CHORUS v ON p.person_id = v.person_id),
             address AS (
-                SELECT entity_id, L.location_id, L.address_1, L.city, L.state, L.zip, L.latitude, L.longitude, L.FIPS, LS.start_date, LS.end_date
-                FROM CDM.LOCATION L LEFT JOIN CDM.LOCATION_HISTORY LS ON L.location_id = LS.location_id)
-            SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address_1, city, state, zip, latitude, longitude
+                SELECT entity_id, L.location_id, L.address_1, L.address_2, L.city, L.state, L.zip, L.county, L.location_source_value, L.country_concept_id, L.country_source_value, L.latitude, L.longitude, LS.start_date, LS.end_date
+                FROM CDM.LOCATION_DEMO L LEFT JOIN CDM.LOCATION_HISTORY_DEMO LS ON L.location_id = LS.location_id)
+            SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address.location_id, address.address_1, address.address_2, address.city, address.state, address.zip, address.county, address.location_source_value, address.country_concept_id, address.country_source_value, address.latitude, address.longitude
             FROM patient p
-            LEFT JOIN address a ON p.person_id = a.entity_id
-            WHERE p.visit_start_date BETWEEN a.start_date AND a.end_date
-              AND p.visit_end_date BETWEEN a.start_date AND a.end_date
+            LEFT JOIN address ON p.person_id = address.entity_id
+            WHERE p.visit_start_date BETWEEN address.start_date AND address.end_date
+              AND p.visit_end_date BETWEEN address.start_date AND address.end_date
               AND visit_start_date >= '2012-01-01'
-              AND (LTRIM(RTRIM(ISNULL(a.latitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))
-              AND (LTRIM(RTRIM(ISNULL(a.longitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))
-              AND NOT (LTRIM(RTRIM(ISNULL(a.address_1, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))"""
+              AND (LTRIM(RTRIM(ISNULL(address.latitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))
+              AND (LTRIM(RTRIM(ISNULL(address.longitude, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))
+              AND NOT (LTRIM(RTRIM(ISNULL(address.address_1, ''))) IN ('', 'na', 'null', 'none', 'nan', '0', 'n/a', ' '))"""
     }
 
     # Function to fetch and save data
@@ -302,13 +302,14 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
 
     # Convert the folder and file paths to absolute paths for Docker
     abs_output_folder = os.path.abspath(output_folder)  # Convert to absolute path
-    abs_preprocessed_file = os.path.abspath(preprocessed_file_path).replace("\\", "/")
+    abs_preprocessed_file = os.path.abspath(preprocessed_file_path)  # Convert to absolute path
 
-    # Fixed: Changed Docker mounting strategy from /tmp to /workspace for consistent volume mounting
-    # and use string slicing to avoid case sensitivity issues in path replacement for Docker container
-    host_base_unix = host_base.replace("\\", "/")
-    container_input_path = '/workspace' + abs_preprocessed_file[len(host_base_unix):]
+    container_cwd = os.getcwd()  # This will be /workspace when using -w /workspace
 
+    # Calculate the relative path from the container's working directory
+    rel_path = os.path.relpath(abs_output_folder, container_cwd)
+    container_input_path = f'/workspace/{rel_path}/{os.path.basename(abs_preprocessed_file)}'
+    
     # Define the Docker command
     # NOTE: Mount the host workspace to allow the geocoder container to access the input file.
     docker_command = [
@@ -320,13 +321,6 @@ def generate_coordinates_degauss(df, columns, threshold, output_folder):
     ]
     logger.debug(f"Using container path {container_input_path} with /workspace mount for geocoder access")
 
-    # ADD DEBUG PRINTS HERE - RIGHT BEFORE EXECUTION
-    print(f'abs_preprocessed_file: {abs_preprocessed_file}')
-    print(f'basename: {os.path.basename(abs_preprocessed_file)}')
-    print(f'files in directory: {os.listdir(abs_output_folder)}')
-    print(f'docker command: {docker_command}')
-
-    print("running Docker command......")
     try:
         # Execute Docker command to run the geocoder
         result = subprocess.run(' '.join(docker_command), shell=True, check=True, capture_output=True, text=True)
@@ -381,10 +375,11 @@ def generate_fips_degauss(df, year, output_folder):
     
     output_file = os.path.join(output_folder, f"preprocessed_2_census_block_group_0.6.0_{year}.csv")    
 
-    # Fixed: Changed Docker mounting strategy from /tmp to /workspace for consistent volume mounting
-    # and use string slicing to avoid case sensitivity issues in path replacement for Docker container
-    host_base_unix = host_base.replace("\\", "/")
-    container_input_path = '/workspace' + abs_preprocessed_file[len(host_base_unix):]
+    container_cwd = os.getcwd()  # This will be /workspace when using -w /workspace
+
+    # Calculate the relative path from the container's working directory
+    rel_path = os.path.relpath(abs_output_folder, container_cwd)
+    container_input_path = f'/workspace/{rel_path}/{os.path.basename(abs_preprocessed_file)}'
     # output_file = f"{df.replace('.csv', '')}_census_block_group_0.6.0_{year}.csv"
     # Define the Docker command
     # NOTE: Mount the host workspace to allow the census container to access the input file.
@@ -457,7 +452,10 @@ def process_fips_generation(df, output_folder, base_filename):
         all_fips_df = pd.concat([fips_df_2010, fips_df_2020], ignore_index=True)
         all_fips_df.drop(columns=['year_for_fips'], inplace=True)
         all_fips_df.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
-        all_fips_df.to_csv(encounter_with_fips_file, index=False)
+        # Add FIPS to original df
+        df['FIPS'] = all_fips_df['FIPS']
+        df.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
+        df.to_csv(encounter_with_fips_file, index=False)
         logger.info(f"Encounter with FIPS file generated: {encounter_with_fips_file}")
         generated_fips_files.append(encounter_with_fips_file)  # Add to list
 
@@ -465,7 +463,10 @@ def process_fips_generation(df, output_folder, base_filename):
         fips_df_2010 = pd.read_csv(fips_file_2010)
         fips_df_2010.drop(columns=['year_for_fips'], inplace=True)
         fips_df_2010.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
-        fips_df_2010.to_csv(encounter_with_fips_file, index=False)
+        # Add FIPS to original df
+        df['FIPS'] = fips_df_2010['FIPS']
+        df.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
+        df.to_csv(encounter_with_fips_file, index=False)
         logger.info(f"FIPS file generated for 2010 with {len(fips_df_2010)} rows: {encounter_with_fips_file}")
         generated_fips_files.append(encounter_with_fips_file)  # Add to list
 
@@ -473,7 +474,10 @@ def process_fips_generation(df, output_folder, base_filename):
         fips_df_2020 = pd.read_csv(fips_file_2020)
         fips_df_2020.drop(columns=['year_for_fips'], inplace=True)
         fips_df_2020.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
-        fips_df_2020.to_csv(encounter_with_fips_file, index=False)
+        # Add FIPS to original df
+        df['FIPS'] = fips_df_2020['FIPS']
+        df.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
+        df.to_csv(encounter_with_fips_file, index=False)
         logger.info(f"FIPS file generated for 2020 with {len(fips_df_2020)} rows: {encounter_with_fips_file}")
         generated_fips_files.append(encounter_with_fips_file)  # Add to list
 
@@ -632,14 +636,59 @@ def process_directory(directory):
 
     logger.info(f"Completed processing for {process_type}")
 
-    # Now delete all the subdirectories and files except for the zip files
-    for root, dirs, files in os.walk(output_dir):
-        for dir_name in dirs:
-            dir_path = os.path.join(root, dir_name)
-            shutil.rmtree(dir_path)
-            logger.info(f"Deleted directory: {dir_path}")
-          
-        
+def export_location_history(user, password, server, port, database):
+    """
+    Exports the LOCATION_HISTORY table to LOCATION_HISTORY.csv
+    """
+    conn_str = f"mssql+pyodbc://{user}:{password}@{server}:{port}/{database}?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=yes"
+    engine = create_engine(conn_str)
+    
+    query = "SELECT * FROM CDM.LOCATION_HISTORY_DEMO"
+    
+    with engine.connect() as conn:
+        df = pd.read_sql(query, conn)
+    
+    output_path = os.path.join(base_output_dir, 'LOCATION_HISTORY.csv')
+    df.to_csv(output_path, index=False)
+    logger.info(f"LOCATION_HISTORY.csv created at {output_path}")
+
+def create_location_csv(base_output_dir):
+    """
+    Create a LOCATION.csv file from the processed FIPS data.
+    Collect unique locations with address, lat, long, FIPS.
+    """
+    import glob
+    
+    # Find all FIPS files
+    fips_pattern = os.path.join(base_output_dir, 'OMOP_FIPS_result', '**', '*_with_fips.csv')
+    fips_files = glob.glob(fips_pattern, recursive=True)
+    logger.info(f"Found FIPS files: {fips_files}")
+    
+    all_data = []
+    for file in fips_files:
+        df = pd.read_csv(file)
+        logger.info(f"Columns in {file}: {list(df.columns)}")
+        # Assume columns: person_id, visit_occurrence_id, year, location_id, address_1, address_2, city, state, zip, county, location_source_value, country_concept_id, country_source_value, latitude, longitude, FIPS
+        # Keep only location-related columns
+        location_cols = ['location_id', 'address_1', 'address_2', 'city', 'state', 'zip', 'county', 'location_source_value', 'country_concept_id', 'country_source_value', 'latitude', 'longitude', 'FIPS']
+        if all(col in df.columns for col in location_cols):
+            loc_df = df[location_cols].drop_duplicates()
+            all_data.append(loc_df)
+    
+    if all_data:
+        combined_df = pd.concat(all_data, ignore_index=True).drop_duplicates()
+        # Reorder columns to match expected format
+        columns_order = ['location_id', 'address_1', 'address_2', 'city', 'state', 'zip', 'county', 'location_source_value', 'country_concept_id', 'country_source_value', 'latitude', 'longitude', 'FIPS']
+        combined_df = combined_df[columns_order]
+        # Sort by location_id in ascending order
+        combined_df = combined_df.sort_values('location_id')
+        # Save to LOCATION.csv in the base output dir
+        output_path = os.path.join(base_output_dir, 'LOCATION.csv')
+        combined_df.to_csv(output_path, index=False)
+        logger.info(f"LOCATION.csv created at {output_path}")
+    else:
+        logger.warning("No FIPS data found to create LOCATION.csv")
+
 def main():
     parser = argparse.ArgumentParser(description="Export data from SQL Server to CSV files.")
     parser.add_argument('--user', required=True, help='Database username')
@@ -654,9 +703,33 @@ def main():
     # Call the function with parsed arguments
     omop_extraction(args.user, args.password, args.server, args.port, args.database)
     
+    # Export LOCATION_HISTORY table
+    export_location_history(args.user, args.password, args.server, args.port, args.database)
+    
     process_directory(os.path.join(linkage_data_dir, 'invalid_lat_lon_address'))
     process_directory(os.path.join(linkage_data_dir, 'valid_address'))
     process_directory(os.path.join(linkage_data_dir, 'valid_lat_long'))
+    
+    # Create LOCATION.csv from processed data
+    create_location_csv(base_output_dir)
+
+    # Move ZIP files to base output directory before deleting subdirectories
+    import shutil
+    fips_result_dir = os.path.join(base_output_dir, 'OMOP_FIPS_result')
+    for root, dirs, files in os.walk(fips_result_dir):
+        for file in files:
+            if file.endswith('.zip'):
+                src = os.path.join(root, file)
+                dst = os.path.join(base_output_dir, file)
+                shutil.move(src, dst)
+                logger.info(f"Moved ZIP file: {dst}")
+
+    # Now delete all subdirectories after creating LOCATION.csv
+    for root, dirs, files in os.walk(fips_result_dir):
+        for dir_name in dirs:
+            dir_path = os.path.join(root, dir_name)
+            shutil.rmtree(dir_path)
+            logger.info(f"Deleted directory: {dir_path}")
 
 
 

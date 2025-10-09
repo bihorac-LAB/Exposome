@@ -322,7 +322,23 @@ def generate_fips_degauss(df, year, output_folder):
         return None
 
 # Function to process each individual CSV file
-def process_csv_file(file, input_folder, final_coordinate_files):
+def validate_location_columns(file_path):
+    df = pd.read_csv(file_path, nrows=0)
+    required = ['location_id', 'address_1', 'address_2', 'city', 'state', 'zip', 'county', 'location_source_value', 'country_concept_id', 'country_source_value', 'latitude', 'longitude']
+    missing = [col for col in required if col not in df.columns]
+    if missing:
+        logger.error(f"LOCATION.csv is missing required columns: {missing}")
+        sys.exit(1)
+
+def validate_location_history_columns(file_path):
+    df = pd.read_csv(file_path, nrows=0)
+    required = ['location_id', 'relationship_type_concept_id', 'domain_id', 'entity_id', 'start_date', 'end_date']
+    missing = [col for col in required if col not in df.columns]
+    if missing:
+        logger.error(f"LOCATION_HISTORY.csv is missing required columns: {missing}")
+        sys.exit(1)
+
+def process_csv_file(file, input_folder, final_coordinate_files, main_output_folder):
     file_path = os.path.join(input_folder, file)
     base_filename = os.path.splitext(file)[0]
     output_folder = os.path.join(input_folder, file.replace('.csv', ''))
@@ -336,18 +352,37 @@ def process_csv_file(file, input_folder, final_coordinate_files):
     logger.info(f"Processing file: {file_path}")
     df = pd.read_csv(file_path)
     df.rename(columns={col: col.lower().strip() for col in df.columns}, inplace=True)
-    if "latitude" in df.columns and "longitude" in df.columns:
-        option = 3
-        logger.info(f"Detected lat/lon columns in {file}, using option 3.")
-    elif "address" in df.columns:
-        option = 2
-        logger.info(f"Detected address column in {file}, using option 2.")
-    elif all(col in df.columns for col in ["street", "city", "state", "zip"]):
-        option = 1
-        logger.info(f"Detected separate address columns in {file}, using option 1.")
+
+    if base_filename.lower() == 'location':
+        validate_location_columns(file_path)
+        # Special processing for LOCATION.csv
+        if 'latitude' not in df.columns or df['latitude'].isnull().all() or 'longitude' not in df.columns or df['longitude'].isnull().all():
+            df['address'] = (df['address_1'].fillna('') + ' ' + df['address_2'].fillna('') + ' ' + df['city'].fillna('') + ' ' + df['state'].fillna('') + ' ' + df['zip'].fillna('')).str.strip()
+            option = 1
+        else:
+            df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
+            option = 3
+        if 'year_for_fips' not in df.columns:
+            df['year_for_fips'] = 2020
+    elif base_filename.lower() == 'location_history':
+        validate_location_history_columns(file_path)
+        # Just copy to output
+        output_file = os.path.join(main_output_folder, 'LOCATION_HISTORY.csv')
+        shutil.copy(file_path, output_file)
+        return output_file
     else:
-        logger.error(f"No valid location columns found in {file}, skipping.")
-        return None
+        if "latitude" in df.columns and "longitude" in df.columns:
+            option = 3
+            logger.info(f"Detected lat/lon columns in {file}, using option 3.")
+        elif "address" in df.columns:
+            option = 2
+            logger.info(f"Detected address column in {file}, using option 2.")
+        elif all(col in df.columns for col in ["street", "city", "state", "zip"]):
+            option = 1
+            logger.info(f"Detected separate address columns in {file}, using option 1.")
+        else:
+            logger.error(f"No valid location columns found in {file}, skipping.")
+            return None
     
     # Step 1: Check if latitude and longitude are provided (skip geocode if present)
     if option == 3:
@@ -356,11 +391,12 @@ def process_csv_file(file, input_folder, final_coordinate_files):
         logger.info(f"CSV Headers: {df.columns}")
         df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
 
-        if "year" in df.columns:
-            df['year_for_fips'] = df['year'].apply(lambda x: 2010 if x < 2020 else 2020)
-        else:
-            logger.error("No valid date column found to infer year.")
-            return None
+        if 'year_for_fips' not in df.columns:
+            if "year" in df.columns:
+                df['year_for_fips'] = df['year'].apply(lambda x: 2010 if x < 2020 else 2020)
+            else:
+                logger.error("No valid date column found to infer year.")
+                return None
 
     # Step 2: If latitude and longitude are not provided, check for address columns
     elif option in [1, 2]:
@@ -372,7 +408,10 @@ def process_csv_file(file, input_folder, final_coordinate_files):
 
         # Load geocoded file after processing
         df = pd.read_csv(geocoded_file)
-        df['year_for_fips'] = df['year'].apply(lambda x: 2010 if x < 2020 else 2020)
+        if 'year' in df.columns:
+            df['year_for_fips'] = df['year'].apply(lambda x: 2010 if x < 2020 else 2020)
+        else:
+            df['year_for_fips'] = 2020
 
         output_file = os.path.join(output_folder, f"{base_filename}_with_coordinates.csv")
         if not os.path.exists(output_file):
@@ -384,7 +423,8 @@ def process_csv_file(file, input_folder, final_coordinate_files):
         else:
             logger.info(f"Coordinate file already exists, skipping save: {output_file}")
 
-        final_coordinate_files.append(output_file)
+        if base_filename.lower() != 'location':
+            final_coordinate_files.append(output_file)
 
     else:
         logger.error("You must provide either address columns (for geocoding) or latitude and longitude.")
@@ -413,10 +453,15 @@ def process_csv_file(file, input_folder, final_coordinate_files):
 
         if generated_dfs:
             final_df = pd.concat(generated_dfs, ignore_index=True) if len(generated_dfs) > 1 else generated_dfs[0]
-            final_df.to_csv(encounter_with_fips_file, index=False)
-            logger.info(f"Final encounter file with FIPS generated: {encounter_with_fips_file}")
+            if base_filename.lower() == 'location':
+                output_path = os.path.join(main_output_folder, 'LOCATION.csv')
+            else:
+                output_path = encounter_with_fips_file
+            final_df.to_csv(output_path, index=False)
+            logger.info(f"Final encounter file with FIPS generated: {output_path}")
         else:
             logger.error("Error: No FIPS files were generated successfully.")
+            return None
 
     try:
         del df
@@ -424,7 +469,12 @@ def process_csv_file(file, input_folder, final_coordinate_files):
     except NameError:
         pass
     gc.collect()
-    return encounter_with_fips_file
+    if base_filename.lower() == 'location':
+        return output_path
+    elif base_filename.lower() == 'location_history':
+        return output_file
+    else:
+        return encounter_with_fips_file
 
 def main():
     parser = argparse.ArgumentParser(description='FIPS Geocoding')
@@ -458,7 +508,7 @@ def main():
 
    # Step 1: Use ThreadPoolExecutor to process up to 10 files concurrently
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        futures = {executor.submit(process_csv_file, file, input_folder, final_coordinate_files): file for file in csv_files}
+        futures = {executor.submit(process_csv_file, file, input_folder, final_coordinate_files, output_folder): file for file in csv_files}
 
         for future in concurrent.futures.as_completed(futures):
             file = futures[future]
@@ -479,7 +529,9 @@ def main():
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
         for final_file in final_fips_files:
             if os.path.exists(final_file):  # Only include files that exist
-                zipf.write(final_file, os.path.basename(final_file))  # Add the file to the zip archive
+                basename = os.path.basename(final_file)
+                if basename not in ['LOCATION.csv', 'LOCATION_HISTORY.csv']:
+                    zipf.write(final_file, basename)  # Add the file to the zip archive
             else:
                 logger.error(f"Skipping missing file: {final_file}")
 
