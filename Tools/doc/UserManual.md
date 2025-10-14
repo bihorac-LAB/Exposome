@@ -25,7 +25,15 @@ This repository provides a reproducible workflow to geocode patient location dat
         - [Improving Hospital Address Detection](#improving-hospital-address-detection)
           - [Note on `HOSPITAL_ADDRESSES` Format](#note-on-hospital_addresses-format)
       - [OMOP Input (Option 3)](#omop-input-option-3-1)
-    - [Step 4: Link with Exposome Web Platform](#step-4-link-with-exposome-web-platform)
+    - [Step 4: GIS Linkage with PostGIS-SDoH Tool](#step-4-gis-linkage-with-postgis-sdoh-tool)
+      - [Prerequisites for GIS Linkage](#prerequisites-for-gis-linkage)
+      - [Expected Outputs](#expected-outputs)
+      - [GIS Linkage Workflow](#gis-linkage-workflow)
+      - [Notes \& Tips](#notes--tips)
+    - [Step 5: Validate \& Inspect Outputs](#step-5-validate--inspect-outputs)
+    - [Step 6: Optional - Site-level Date Shifting](#step-6-optional---site-level-date-shifting)
+    - [Step 7: Upload \& Centralized De-identification](#step-7-upload--centralized-de-identification)
+    - [Step 8: Link with Exposome Web Platform](#step-8-link-with-exposome-web-platform)
   - [Appendix](#appendix)
     - [Geocoding Workflow](#geocoding-workflow)
       - [Method: DeGAUSS Toolkit (Docker-based)](#method-degauss-toolkit-docker-based)
@@ -240,7 +248,90 @@ LOCATION_HISTORY.csv
 ```
 ---
 
-### Step 4: Link with Exposome Web Platform
+### Step 4: GIS Linkage with PostGIS-SDoH Tool
+
+**What it does:** Spatially joins the lat/lon (and FIPS) from geocoding with geospatial indices (ADI, SVI, AHRQ) and produces `EXTERNAL_EXPOSURE.csv`.
+
+#### Prerequisites for GIS Linkage
+- Docker installed.
+- Clone the [postgis-exposure repository](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure).
+- Update your `LOCATION` files to include the geocoded lat/lon and FIPS from Step 2.
+- Prepare the site's `LOCATION_HISTORY`.
+- Ensure `DATA_SRC_SIMPLE.csv` and `VRBL_SRC_SIMPLE.csv` files are available (centrally managed; no edits required).
+- **Important:** Do not date-shift your LOCATION/LOCATION_HISTORY files before linkage. Date shifting (if used) should occur following this step.
+
+`DATA_SRC_SIMPLE.csv` and `VRBL_SRC_SIMPLE.csv` files can be found [here](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure/csv)
+
+Sample `LOCATION` and `LOCATION_HISTORY` files can be found [here](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure/test)
+
+#### Expected Outputs
+- `EXTERNAL_EXPOSURE.csv` containing linked indices (ADI, SVI, AHRQ metrics, etc.).
+
+#### GIS Linkage Workflow
+
+1. **Start Postgres/PostGIS container** following the instructions in the [postgis-exposure repository](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure).
+
+   Container sequence: start/load database → ingest location tables → run the produce script.
+
+2. **For the first Docker command (prepares the database):**
+
+   ```bash
+   docker run --rm --name postgis-chorus \
+     --env POSTGRES_PASSWORD=dummy \
+     --env VARIABLES=134,135,136 \
+     --env DATA_SOURCES=1234,5150,9999 \
+     -v $(pwd)/test/source:/source \
+     -d ghcr.io/chorus-ai/chorus-postgis-sdoh:main
+   ```
+
+   - Replace `VARIABLES` with the comma-separated list of variable IDs you need from `VRBL_SRC_SIMPLE.csv`.
+   - Replace `DATA_SOURCES` with the relevant data source IDs (from `DATA_SRC_SIMPLE.csv`).
+
+3. **Run the second Docker command to generate the external exposure file:**
+
+   ```bash
+   docker exec postgis-chorus /app/produce_external_exposure.sh
+   ```
+
+4. **Output:** `EXTERNAL_EXPOSURE.csv` in your mounted directory (e.g., `./test/source`).
+
+#### Notes & Tips
+- Run these commands in Terminal (Mac) or WSL/PowerShell/Command Prompt on Windows; WSL is usually more robust for Docker on Windows.
+- If your site needs more variables, expand `VARIABLES` accordingly.
+
+---
+
+### Step 5: Validate & Inspect Outputs
+- Open `EXTERNAL_EXPOSURE.csv`. Confirm:
+  - Patient ID, lat, lon, FIPS
+  - ADI, SVI, AHRQ, and VRBL-coded fields
+- Spot-check a few records for accuracy.
+- If errors:
+  - Ensure `LOCATION` has valid lat/lon/FIPS
+  - Confirm `VARIABLES` and `DATA_SOURCES` are correct
+  - Check mount paths
+
+---
+
+### Step 6: Optional - Site-level Date Shifting
+**Purpose:** Anonymize temporal data while preserving relative timelines.
+
+**Guidelines:**
+- Apply date shifts locally before upload — do not date-shift prior to GIS linkage.
+- Input: `EXTERNAL_EXPOSURE.csv` (from Step 4)
+- Output: `EXTERNAL_EXPOSURE_date_shifted.csv`
+
+See [Date Shifting SOP for More Details](https://github.com/chorus-ai/Chorus_SOP/blob/main/sop-website/docs/Privacy/Date-Shifting.mdx).
+
+---
+
+### Step 7: Upload & Centralized De-identification
+1. Upload the (optionally date-shifted) `EXTERNAL_EXPOSURE.csv` to the central repository.
+2. The central team will apply further de-identification.
+
+---
+
+### Step 8: Link with Exposome Web Platform
 1. Register at [https://exposome.rc.ufl.edu](https://exposome.rc.ufl.edu/)  
 2. Upload `*_with_fips.zip` file obtained from Step 3 
 3. Input CSV must contain:  
@@ -249,7 +340,7 @@ LOCATION_HISTORY.csv
    - `year`  
    - `FIPS`
 4. Select the dataset you want to link it to
-6. Download enriched dataset with SDoH variables
+5. Download enriched dataset with SDoH variables
 ---
 
 ## Appendix
