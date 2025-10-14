@@ -68,7 +68,7 @@ Sample input files can be found [here](https://github.com/bihorac-LAB/Exposome/t
 | 1250 W 16th St Jacksonville FL 32209         | 2019 | 1              |
 | 2001 SW 16th St Gainesville FL 32608         | 2019 | 2              |
 
-Optionally, you can include the CSV files for LOCATION and LOCATION_HISTORY in the input folder to process data:
+Optionally, you can include the CSV files for [`LOCATION`](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input/LOCATION.csv) and [`LOCATION_HISTORY`](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input/LOCATION_HISTORY.csv) in the input folder to process data:
 
 - **LOCATION.csv**
 
