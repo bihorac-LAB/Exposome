@@ -81,11 +81,11 @@ def omop_extraction(user, password, server, port, database):
         'Latlong': """
             WITH patient AS (
                 SELECT p.person_id, v.visit_occurrence_id, v.visit_start_date, v.visit_end_date
-                FROM CDM.PERSON_CHORUS p
-                LEFT JOIN CDM.VISIT_OCCURRENCE_CHORUS v ON p.person_id = v.person_id),
+                FROM CDM.PERSON p
+                LEFT JOIN CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
             address AS (
                 SELECT entity_id, L.location_id, L.address_1, L.address_2, L.city, L.state, L.zip, L.county, L.location_source_value, L.country_concept_id, L.country_source_value, L.latitude, L.longitude, LS.start_date, LS.end_date
-                FROM CDM.LOCATION_DEMO L LEFT JOIN CDM.LOCATION_HISTORY_DEMO LS ON L.location_id = LS.location_id)
+                FROM CDM.LOCATION L LEFT JOIN CDM.LOCATION_HISTORY LS ON L.location_id = LS.location_id)
             SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address.location_id, address.address_1, address.address_2, address.city, address.state, address.zip, address.county, address.location_source_value, address.country_concept_id, address.country_source_value, address.latitude, address.longitude
             FROM patient p
             LEFT JOIN address ON p.person_id = address.entity_id
@@ -98,11 +98,11 @@ def omop_extraction(user, password, server, port, database):
         'Invalid': """
             WITH patient AS (
                 SELECT p.person_id, v.visit_occurrence_id, YEAR(v.visit_start_date) AS year
-                FROM CDM.PERSON_CHORUS p
-                LEFT JOIN CDM.VISIT_OCCURRENCE_CHORUS v ON p.person_id = v.person_id),
+                FROM CDM.PERSON p
+                LEFT JOIN CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
             address AS (
                 SELECT entity_id, L.location_id, L.address_1, L.address_2, L.city, L.state, L.zip, L.county, L.location_source_value, L.country_concept_id, L.country_source_value, L.latitude, L.longitude, LS.start_date, LS.end_date
-                FROM CDM.LOCATION_DEMO L LEFT JOIN CDM.LOCATION_HISTORY_DEMO LS ON L.location_id = LS.location_id)
+                FROM CDM.LOCATION L LEFT JOIN CDM.LOCATION_HISTORY LS ON L.location_id = LS.location_id)
             SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address.location_id, address.address_1, address.address_2, address.city, address.state, address.zip, address.county, address.location_source_value, address.country_concept_id, address.country_source_value, address.latitude, address.longitude
             FROM patient p
             LEFT JOIN address ON p.person_id = address.entity_id
@@ -116,11 +116,11 @@ def omop_extraction(user, password, server, port, database):
         'Address': """
             WITH patient AS (
                 SELECT p.person_id, v.visit_occurrence_id, YEAR(v.visit_start_date) AS year
-                FROM CDM.PERSON_CHORUS p
-                LEFT JOIN CDM.VISIT_OCCURRENCE_CHORUS v ON p.person_id = v.person_id),
+                FROM CDM.PERSON p
+                LEFT JOIN CDM.VISIT_OCCURRENCE v ON p.person_id = v.person_id),
             address AS (
                 SELECT entity_id, L.location_id, L.address_1, L.address_2, L.city, L.state, L.zip, L.county, L.location_source_value, L.country_concept_id, L.country_source_value, L.latitude, L.longitude, LS.start_date, LS.end_date
-                FROM CDM.LOCATION_DEMO L LEFT JOIN CDM.LOCATION_HISTORY_DEMO LS ON L.location_id = LS.location_id)
+                FROM CDM.LOCATION L LEFT JOIN CDM.LOCATION_HISTORY LS ON L.location_id = LS.location_id)
             SELECT person_id, visit_occurrence_id, year(visit_start_date) as year, address.location_id, address.address_1, address.address_2, address.city, address.state, address.zip, address.county, address.location_source_value, address.country_concept_id, address.country_source_value, address.latitude, address.longitude
             FROM patient p
             LEFT JOIN address ON p.person_id = address.entity_id
