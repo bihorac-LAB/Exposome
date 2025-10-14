@@ -219,7 +219,7 @@ When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FI
 - Fields are separated by single spaces.  
 ---
 #### OMOP Input (Option 3)
-Sample output files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/output)
+Sample output files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/OMOP/output)
 
 ```
 OMOP_data/
