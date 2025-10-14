@@ -51,8 +51,9 @@ The backend uses [DeGAUSS](https://degauss.org) Docker containers for geocoding.
 ## Input Options
 
 You need to prepare **only ONE** of the following data elements per encounter.  
-Sample files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/address_files/input)
 ### Option 1: Address
+Sample input files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/address_files/input)
+
 - **Format A: Multi-Column Address**
 
 | street           | city         | state | zip   | year | entity_id |
@@ -67,27 +68,7 @@ Sample files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/ma
 | 1250 W 16th St Jacksonville FL 32209         | 2019 | 1              |
 | 2001 SW 16th St Gainesville FL 32608         | 2019 | 2              |
 
-> **Tip:** Street **and** ZIP are required. Missing fields may result in imprecise geocoding.
-
-### Option 2: Coordinates
-
-| latitude   | longitude |
-|------------|-----------|
-| 30.353463  | -81.6749  |
-| 29.634219  | -82.3433  |
-
-### Option 3: OMOP CDM
-
-| Table              | Required Columns |
-|--------------------|------------------------------------------------------|
-| person             | person_id                                            |
-| visit_occurrence   | visit_occurrence_id, visit_start_date, visit_end_date, person_id |
-| location           | location_id, address_1, city, state, zip, latitude, longitude |
-| location_history   | entity_id, start_date, end_date                      |
-
-### Option 4: OMOP Tables (CSV Format)
-
-Optionally, you can include the following CSV files in the input folder to process OMOP table data:
+Optionally, you can include the CSV files for LOCATION and LOCATION_HISTORY in the input folder to process data:
 
 - **LOCATION.csv**
 
@@ -101,7 +82,27 @@ Optionally, you can include the following CSV files in the input folder to proce
 |-------------|------------------------------|-----------|-----------|------------|----------|
 | 1           | 32848                        | 1147314   | 3763      | 1998-01-01 | 2020-01-01 |
 
-These files will be validated for required columns, and LOCATION.csv will be updated with FIPS codes if latitude/longitude are present or generated from addresses.
+These files will be validated for required columns, and LOCATION.csv will be updated with FIPS codes if latitude/longitude are present.
+
+> **Tip:** Street **and** ZIP are required. Missing fields may result in imprecise geocoding.
+
+### Option 2: Coordinates
+
+Sample input files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input)
+
+| latitude   | longitude | entity_id |
+|------------|-----------|-----------|
+| 30.353463  | -81.6749  | 1         |
+| 29.634219  | -82.3433  | 2         |
+
+### Option 3: OMOP CDM
+
+| Table              | Required Columns |
+|--------------------|------------------------------------------------------|
+| person             | person_id                                            |
+| visit_occurrence   | visit_occurrence_id, visit_start_date, visit_end_date, person_id |
+| location           | location_id, address_1, address_2, city, state, zip, location_source_value, country_concept_id, country_source_value, latitude, longitude |
+| location_history   | location_id, relationship_type_concept_id, domain_id, entity_id, start_date, end_date |
 
 ---
 ## Usage
@@ -110,12 +111,12 @@ These files will be validated for required columns, and LOCATION.csv will be upd
 You need to prepare **only ONE** of the data elements as indicated under the [Input Options](#input-options) per encounter.  
 For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your data in a **CSV file**.  
 - Place the CSV file(s) in a dedicated folder (e.g., 📂`input_address/` or 📂`input_coordinates/`).
-- Optionally, include `LOCATION.csv` and `LOCATION_HISTORY.csv` files as per Option 4 for OMOP table processing.
+- Optionally, include `LOCATION.csv` and `LOCATION_HISTORY.csv` files for address processing.
 
 ### Step 2: Generate FIPS Codes
 > Container: `prismaplab/exposome-geocoder:1.0.3`  
 > Ensure Docker Desktop is running.  
-> On Windows, run commands from WSL. Makesure you have VSCode installed with the WSL extension.
+> On Windows, run commands from WSL.
 
 #### CSV Input (Option 1 & 2)
 
@@ -174,6 +175,8 @@ docker run -it --rm \
 When you run the Docker command in Step2 (for Option 1, 2, or 3), the pipeline generates a zipped file with the following structure:
 
 #### CSV Input (Option 1 & 2)
+Sample output files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/address_files/output)
+
 Generated per file:
   - `<filename>_with_coordinates.csv` — input + latitude/longitude  
   - `<filename>_with_fips.csv` — input + FIPS codes  
@@ -186,7 +189,7 @@ Zipped outputs:
 
 If `LOCATION.csv` is provided, it will be updated with FIPS codes and saved as `LOCATION.csv` in the output folder. `LOCATION_HISTORY.csv` will be copied unchanged to the output folder. These files are not included in the zip archives.
 
-**Output Columns Description**
+**Zipped Output Columns Description**
 
 | Column           | Description                                                                 |
 |------------------|-----------------------------------------------------------------------------|
@@ -216,6 +219,7 @@ When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FI
 - Fields are separated by single spaces.  
 ---
 #### OMOP Input (Option 3)
+Sample output files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/output)
 
 ```
 OMOP_data/
@@ -230,6 +234,9 @@ OMOP_FIPS_result/
 ├── latlong/
 │   └── latlong_with_fips.zip          # CSVs with FIPS from coordinates
 ├── invalid/                           # Usually empty; no usable location data
+
+LOCATION.csv
+LOCATION_HISTORY.csv
 ```
 ---
 
