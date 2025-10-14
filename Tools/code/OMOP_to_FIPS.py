@@ -643,7 +643,7 @@ def export_location_history(user, password, server, port, database):
     conn_str = f"mssql+pyodbc://{user}:{password}@{server}:{port}/{database}?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=yes&TrustServerCertificate=yes"
     engine = create_engine(conn_str)
     
-    query = "SELECT * FROM CDM.LOCATION_HISTORY_DEMO"
+    query = "SELECT * FROM CDM.LOCATION_HISTORY"
     
     with engine.connect() as conn:
         df = pd.read_sql(query, conn)
