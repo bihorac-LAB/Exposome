@@ -90,7 +90,7 @@ Optionally, you can include the CSV files for [`LOCATION`](https://github.com/bi
 |-------------|------------------------------|-----------|-----------|------------|----------|
 | 1           | 32848                        | 1147314   | 3763      | 1998-01-01 | 2020-01-01 |
 
-These files will be validated for required columns, and LOCATION.csv will be updated with FIPS codes if latitude/longitude are present.
+These files will be validated for required columns.
 
 > **Tip:** Street **and** ZIP are required. Missing fields may result in imprecise geocoding.
 
@@ -195,7 +195,7 @@ Zipped outputs:
   - `output/geocoded_fips_codes_<timestamp>.zip`
 - Note: `<timestamp>` is a datetime string indicating when the script was executed (e.g., 20250624_150230).
 
-If `LOCATION.csv` is provided, it will be updated with FIPS codes and saved as `LOCATION.csv` in the output folder. `LOCATION_HISTORY.csv` will be copied unchanged to the output folder. These files are not included in the zip archives.
+If `LOCATION.csv` and `LOCATION_HISTORY.csv` are provided, they will be copied to the output folder. These files are not included in the zip archives.
 
 **Zipped Output Columns Description**
 
@@ -255,7 +255,7 @@ LOCATION_HISTORY.csv
 #### Prerequisites for GIS Linkage
 - Docker installed.
 - Clone the [postgis-exposure repository](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure).
-- Update your `LOCATION` files to include the geocoded lat/lon and FIPS from Step 2.
+- Update your `LOCATION` files to include the geocoded lat/lon from Step 2.
 - Prepare the site's `LOCATION_HISTORY`.
 - Ensure `DATA_SRC_SIMPLE.csv` and `VRBL_SRC_SIMPLE.csv` files are available (centrally managed; no edits required).
 - **Important:** Do not date-shift your LOCATION/LOCATION_HISTORY files before linkage. Date shifting (if used) should occur following this step.
@@ -298,6 +298,7 @@ Sample `LOCATION` and `LOCATION_HISTORY` files can be found [here](https://githu
 #### Notes & Tips
 - Run these commands in Terminal (Mac) or WSL/PowerShell/Command Prompt on Windows; WSL is usually more robust for Docker on Windows.
 - If your site needs more variables, expand `VARIABLES` accordingly.
+- **Note:** The Docker container may only run successfully once. If you need to run it again, you may need to delete the container and image, then pull the image again before re-running the command.
 
 ---
 
