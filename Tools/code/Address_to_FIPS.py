@@ -313,7 +313,7 @@ def generate_fips_degauss(df, year, output_folder):
     if os.path.exists(output_file):
         logger.info(f"Output file generated: {output_file}")
         df = pd.read_csv(output_file)
-        df['FIPS'] = df[f'census_tract_id_{year}']
+        # df['FIPS'] = df[f'census_tract_id_{year}']
         df.drop(columns=[f'census_block_group_id_{year}', f'census_tract_id_{year}'], inplace=True)
         df.to_csv(output_file, index=False)
         return output_file

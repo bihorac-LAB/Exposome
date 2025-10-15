@@ -406,7 +406,7 @@ def generate_fips_degauss(df, year, output_folder):
     if os.path.exists(output_file):
         logger.info(f"Output file generated: {output_file}")
         df = pd.read_csv(output_file)
-        df['FIPS'] = df[f'census_tract_id_{year}']
+        # df['FIPS'] = df[f'census_tract_id_{year}']
         df.drop(columns=[f'census_block_group_id_{year}', f'census_tract_id_{year}'], inplace=True)
         df.to_csv(output_file, index=False)
         return output_file
@@ -453,7 +453,7 @@ def process_fips_generation(df, output_folder, base_filename):
         all_fips_df.drop(columns=['year_for_fips'], inplace=True)
         all_fips_df.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
         # Add FIPS to original df
-        df['FIPS'] = all_fips_df['FIPS']
+        # df['FIPS'] = all_fips_df['FIPS']
         df.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
         df.to_csv(encounter_with_fips_file, index=False)
         logger.info(f"Encounter with FIPS file generated: {encounter_with_fips_file}")
@@ -464,7 +464,7 @@ def process_fips_generation(df, output_folder, base_filename):
         fips_df_2010.drop(columns=['year_for_fips'], inplace=True)
         fips_df_2010.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
         # Add FIPS to original df
-        df['FIPS'] = fips_df_2010['FIPS']
+        # df['FIPS'] = fips_df_2010['FIPS']
         df.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
         df.to_csv(encounter_with_fips_file, index=False)
         logger.info(f"FIPS file generated for 2010 with {len(fips_df_2010)} rows: {encounter_with_fips_file}")
@@ -475,7 +475,7 @@ def process_fips_generation(df, output_folder, base_filename):
         fips_df_2020.drop(columns=['year_for_fips'], inplace=True)
         fips_df_2020.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
         # Add FIPS to original df
-        df['FIPS'] = fips_df_2020['FIPS']
+        # df['FIPS'] = fips_df_2020['FIPS']
         df.rename(columns={'lat': 'latitude', 'lon': 'longitude'}, inplace=True)
         df.to_csv(encounter_with_fips_file, index=False)
         logger.info(f"FIPS file generated for 2020 with {len(fips_df_2020)} rows: {encounter_with_fips_file}")
@@ -670,7 +670,7 @@ def create_location_csv(base_output_dir):
         logger.info(f"Columns in {file}: {list(df.columns)}")
         # Assume columns: person_id, visit_occurrence_id, year, location_id, address_1, address_2, city, state, zip, county, location_source_value, country_concept_id, country_source_value, latitude, longitude, FIPS
         # Keep only location-related columns
-        location_cols = ['location_id', 'address_1', 'address_2', 'city', 'state', 'zip', 'county', 'location_source_value', 'country_concept_id', 'country_source_value', 'latitude', 'longitude', 'FIPS']
+        location_cols = ['location_id', 'address_1', 'address_2', 'city', 'state', 'zip', 'county', 'location_source_value', 'country_concept_id', 'country_source_value', 'latitude', 'longitude']  # Removed 'FIPS'
         if all(col in df.columns for col in location_cols):
             loc_df = df[location_cols].drop_duplicates()
             all_data.append(loc_df)
@@ -678,7 +678,7 @@ def create_location_csv(base_output_dir):
     if all_data:
         combined_df = pd.concat(all_data, ignore_index=True).drop_duplicates()
         # Reorder columns to match expected format
-        columns_order = ['location_id', 'address_1', 'address_2', 'city', 'state', 'zip', 'county', 'location_source_value', 'country_concept_id', 'country_source_value', 'latitude', 'longitude', 'FIPS']
+        columns_order = ['location_id', 'address_1', 'address_2', 'city', 'state', 'zip', 'county', 'location_source_value', 'country_concept_id', 'country_source_value', 'latitude', 'longitude']  # Removed 'FIPS'
         combined_df = combined_df[columns_order]
         # Sort by location_id in ascending order
         combined_df = combined_df.sort_values('location_id')
