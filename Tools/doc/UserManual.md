@@ -14,7 +14,7 @@ This repository provides a **reproducible workflow** to geocode patient location
     - [Option 1: Address](#option-1-address)
     - [Option 2: Coordinates](#option-2-coordinates)
     - [Option 3: OMOP CDM](#option-3-omop-cdm)
-  - [Usage](#usage)
+  - [Usage Guide](#UsageGuideForGeocoding)
     - [Step 1: Prepare Input Data](#step-1-prepare-input-data)
     - [Step 2: Generate FIPS Codes](#step-2-generate-fips-codes)
       - [CSV Input (Option 1 \& 2)](#csv-input-option-1--2)
