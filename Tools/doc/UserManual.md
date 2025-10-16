@@ -2,9 +2,9 @@
 
 > **Note:** This toolkit does **not** require or share any Protected Health Information (PHI).
 
-This repository provides a reproducible workflow to geocode patient location data and generate Census Tract (FIPS 11-digit) identifiers for linking with Exposome datasets.
+This repository provides a **reproducible workflow** to geocode patient location data and link the resulting Census Tract (FIPS 11-digit) identifiers with Exposome datasets for environmental exposure analysis.
 
-> Demo video can be found [here](https://www.loom.com/share/603607c1365342cb9fb2303566f529cc?sid=81cab3db-8189-4ad4-b1fd-baca7a73bf25)
+> ** Demo video** [Watch ere](https://www.loom.com/share/603607c1365342cb9fb2303566f529cc?sid=81cab3db-8189-4ad4-b1fd-baca7a73bf25)
 ---
 ## 📑 Table of Contents
 - [Geocoding Patient Data for Exposome Linkage](#geocoding-patient-data-for-exposome-linkage)
@@ -44,14 +44,18 @@ This repository provides a reproducible workflow to geocode patient location dat
 ---
 
 ## Overview
-This guide explains how to prepare and process input data using the Exposome Geocoder container (prismaplab/exposome-geocoder:1.0.3) to generate geocoded FIPS codes for addresses or coordinates. 
+This workflow uses **two separate Docker containers** to support end-to-end geocoding and data linkage:
 
-It supports:  
-- Address-based geocoding  
-- Latitude/Longitude geocoding  
-- Extraction from OMOP CDM databases geocoding
+1. **Exposome Geocoder Container (`prismaplab/exposome-geocoder:1.0.3`)**  
+   Performs address or coordinate-based geocoding to generate Census Tract (FIPS 11-digit) codes using [DeGAUSS](https://degauss.org) backend tools.
 
-The backend uses [DeGAUSS](https://degauss.org) Docker containers for geocoding.
+2. **Exposome Linkage Container (`prismaplab/exposome-linker:1.0.0`)**  
+   Integrates the geocoded outputs with relevant environmental and social determinant datasets to produce analysis-ready files.
+
+Together, these containers enable:  
+- Address and latitude/longitude-based geocoding  
+- OMOP CDM geocoding extraction and processing  
+- Automated geocoded-based dataset linkage for exposome  
 
 ---
 
@@ -77,20 +81,26 @@ Sample input files [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tool
 | 1250 W 16th St Jacksonville FL 32209         | 2019 | 1              |
 | 2001 SW 16th St Gainesville FL 32608         | 2019 | 2              |
 
-Optionally, you can include the CSV files for [`LOCATION`](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input/LOCATION.csv) and [`LOCATION_HISTORY`](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input/LOCATION_HISTORY.csv) in the input folder to process data:
-
 ---
 
 #### Optional Supporting Files
-You may include the following to enhance address processing:
 
-##### LOCATION.csv
+Including the following optional files will help streamline the **end-to-end workflow** between geocoding and exposome linkage:
+
+- [`LOCATION.csv`](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input/LOCATION.csv)  
+- [`LOCATION_HISTORY.csv`](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input/LOCATION_HISTORY.csv)
+
+If these files are provided during **geocoding**, the output will automatically include the updated latitude and longitude information required for the **postgis linkage container**.  
+
+If they are **not provided**, users will need to **manually update their LOCATION files** with the geocoded latitude/longitude before executing the commands for linkage.
+
+##### LOCATION.csv (Follows CDM format)
 
 | location_id | address_1 | address_2 | city | state | zip | county | location_source_value | country_concept_id | country_source_value | latitude | longitude |
 |-------------|-----------|-----------|------|-------|-----|--------|----------------------|-------------------|---------------------|----------|-----------|
 | 1           | 1248 N Blackstone Ave | | FRESNO | CA | 93703 | | UNITED STATES OF AMERICA | | UNITED STATES OF AMERICA | 36.75891146 | -119.7902719 |
 
-##### LOCATION_HISTORY.csv
+##### LOCATION_HISTORY.csv (Follows CDM format)
 
 | location_id | relationship_type_concept_id | domain_id | entity_id | start_date | end_date |
 |-------------|------------------------------|-----------|-----------|------------|----------|
@@ -106,6 +116,8 @@ Sample input files [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tool
 |------------|-----------|-----------|
 | 30.353463  | -81.6749  | 1         |
 | 29.634219  | -82.3433  | 2         |
+
+As with address-based input, including `LOCATION.csv` and `LOCATION_HISTORY.csv` enables seamless downstream processing with the linkage container.
 
 ---
 
