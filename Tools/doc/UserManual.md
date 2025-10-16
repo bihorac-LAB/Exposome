@@ -189,7 +189,7 @@ docker run -it --rm   -v "$(pwd)":/workspace   -v /var/run/docker.sock:/var/run/
 ```
 ---
 
-### For OMOP Input (Option 3)
+#### For OMOP Input (Option 3)
 To extract and geocode directly from an OMOP database:
 
 ```bash
