@@ -21,7 +21,6 @@ This repository provides a **reproducible workflow** to geocode patient location
       - [For OMOP Input (Option 3)](#for-omop-input-option-3)
     - [Step 3: Output Structure](#step-3-output-structure)
       - [CSV Input (Option 1 & 2)](#csv-input-option-1--2)
-        - [Reason Column Values](#reason-column-values)
       - [OMOP Input (Option 3)](#omop-input-option-3)
     - [Step 4: GIS Linkage with PostGIS-Exposure Tool](#step-4-gis-linkage-with-postgis-exposure-tool)
       - [Prerequisites for GIS Linkage](#prerequisites-for-gis-linkage)
