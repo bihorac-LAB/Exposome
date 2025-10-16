@@ -1,4 +1,4 @@
-street,city,state,zip,year,person_deid_id
+street,city,state,zip,year,entity_id
 1250 W 16th St,Jacksonville,FL,32209,2012,1
 2001 SW 16th St,Gainesville,FL,32608,2012,2
 7000 University Blvd,Winter Park,FL,32792,2010,3

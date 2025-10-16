@@ -1,6 +1,6 @@
 venv
 tmp/*
-**/output/*
+# **/output/*
 */Input/*
 **/log/*
 Tools/SDOH/Address-to-fips/*

@@ -1,4 +1,4 @@
-person_id,visit_occurrence_id,year,address_1,city,state,zip,county,latitude,longitude
+entity_id,visit_occurrence_id,year,address_1,city,state,zip,county,latitude,longitude
 6,20,2015,,JACKSONVILLE,FL,322055013,DUVAL,30.3091,-81.72532
 6,21,2015,,JACKSONVILLE,FL,322055013,DUVAL,30.3091,-81.72532
 6,22,2015,,JACKSONVILLE,FL,322055013,DUVAL,30.3091,-81.72532

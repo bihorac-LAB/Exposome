@@ -1,4 +1,4 @@
-street,city,state,zip,year,person_deid_id
+street,city,state,zip,year,entity_id
 1248 N Blackstone Ave,FRESNO,CA,93703,2019,1
 1256 N Fresno St,FRESNO,CA,93703,2019,2
 2615 E Clinton Ave,FRESNO,CA,93703,2019,3
