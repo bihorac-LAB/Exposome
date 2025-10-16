@@ -136,22 +136,35 @@ As with address-based input, including `LOCATION.csv` and `LOCATION_HISTORY.csv`
 
 ### Step 1: Prepare Input Data
 Prepare **only ONE** of the data elements as indicated under the [Input Options](#input-options) per encounter.  
-For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your data in a **CSV file**.  
-- Place the CSV file(s) in a dedicated folder (e.g., 📂`input_address/` or 📂`input_coordinates/`).
+For **Option 1 (Address)** or **Option 2 (Coordinates)**, your data must be in a **CSV file** format. 
+
+#### Folder Structure
+- Place the CSV file(s) in a dedicated folder
+  - 📂 `input_address/`  *(for address-based data)*  
+  - 📂 `input_coordinates/`  *(for coordinate-based data)* 
 - Optionally, include:
   -    `LOCATION.csv`
   -   `LOCATION_HISTORY.csv`
+    
 > ⚠️ Only `.csv` files are supported. Convert `.xlsx` or other formats before running the tool.
 
 ---
 
 ### Step 2: Generate FIPS Codes
+
 **Container:** `prismaplab/exposome-geocoder:1.0.3`  
 Ensure **Docker Desktop** is running.  
 
-#### CSV Input (Option 1 & 2)
+This step uses the Exposome Geocoder container to:
+- Convert addresses or coordinates into latitude/longitude
+- Assign 11-digit Census Tract (FIPS) codes
+
+---
+
+#### For CSV Input (Option 1 & 2)
 
 ##### For macOS / Linux / Ubuntu
+
 ```bash
 docker run -it --rm \
   -v "$(pwd)":/workspace \
@@ -163,20 +176,21 @@ docker run -it --rm \
 ```
 
 ##### For Windows
-- Open cmd or powershell
-- run command `wsl`
-- execute the same command as above inside your WSL terminal.
+- Open Command Prompt or powershell
+- Run command `wsl`
+- Execute the same command as above inside your WSL terminal.
 
 Example:
 
-If you have a file called patients_address.csv under 📂`input_address/`, then run:
+If your file is named patients_address.csv inside 📂`input_address/`, run:
 
 ```bash
 docker run -it --rm   -v "$(pwd)":/workspace   -v /var/run/docker.sock:/var/run/docker.sock   -e HOST_PWD="$(pwd)"   -w /workspace   prismaplab/exposome-geocoder:1.0.3   /app/code/Address_to_FIPS.py -i input_address
 ```
 ---
 
-### OMOP Input Command (Option 3)
+### For OMOP Input (Option 3)
+To extract and geocode directly from an OMOP database:
 
 ```bash
 docker run -it --rm \
@@ -195,16 +209,17 @@ docker run -it --rm \
 ---
 
 ### Step 3: Output Structure
-When you run the Docker command in Step2 (for Option 1, 2, or 3), it generates two ZIP archives and additional files under the `output/` folder.
+After running the geocoder container (for Option 1, 2, or 3), the tool generates output files in the `output/` folder.
 
-#### CSV Input (Option 1 & 2)
-Sample outputs [demo/address_files/output](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/address_files/output)
+#### ** CSV Input (Option 1 & 2)**
+**Sample outputs** [demo/address_files/output](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/address_files/output)
 
-**Generated per file:**
+**Files Generated**
+Each input file produces:
   - `<filename>_with_coordinates.csv` — input + latitude/longitude  
   - `<filename>_with_fips.csv` — input + FIPS codes  
 
-**Zipped outputs:**
+#### **Output Folder Example**
   ```
   output/
   ├── coordinates_from_address_<timestamp>.zip
@@ -231,18 +246,20 @@ Used when geocoding fails or is imprecise. Possible values include:
 - **Blank/Incomplete address** – Address is empty or has missing components.  
 - **Zip missing** – ZIP code not provided.  
 
-> 💡 **Tip:** You can improve hospital detection by adding known addresses to `HOSPITAL_ADDRESSES` in [`Address_to_FIPS.py`](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/code/Address_to_FIPS.py).
+> 💡 **Tip:** You can expand hospital detection by adding known addresses to `HOSPITAL_ADDRESSES` in [`Address_to_FIPS.py`](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/code/Address_to_FIPS.py).
 
-**Note on `HOSPITAL_ADDRESSES` Format**
-  - Is written as a full, single-line string.  
-  - Uses only lowercase letters and numbers.  
-  - Has no commas or special characters.  
-  - Fields are separated by single spaces.
+**Formatting Note for `HOSPITAL_ADDRESSES`:**
+  - Single-line string  
+  - Lowercase letters and numbers only  
+  - No commas or special characters  
+  - Fields separated by single spaces  
   
 ---
 
-#### OMOP Input (Option 3)
-Sample outputs: [demo/OMOP/output](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/OMOP/output)
+#### **OMOP Input (Option 3)**
+**Sample outputs:** [demo/OMOP/output](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/OMOP/output)
+
+#### **Folder Structure**
 
 ```
 OMOP_data/
