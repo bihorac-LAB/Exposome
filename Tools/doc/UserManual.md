@@ -55,7 +55,7 @@ This workflow uses **two separate Docker containers** to support end-to-end geoc
 Together, these containers enable:  
 - Address and latitude/longitude-based geocoding  
 - OMOP CDM geocoding extraction and processing  
-- Automated geocoded-based dataset linkage for exposome  
+- GIS linkage with PostGIS-SDoH indices (ADI, SVI, AHRQ)
 
 ---
 
@@ -277,32 +277,36 @@ LOCATION_HISTORY.csv
 ```
 ---
 
-### Step 4: GIS Linkage with PostGIS-SDoH Tool
+### Step 4: GIS Linkage with PostGIS-Exposure Tool
 
-**What it does:** Spatially joins the lat/lon (and FIPS) from geocoding with geospatial indices (ADI, SVI, AHRQ) and produces `EXTERNAL_EXPOSURE.csv`.
+**Purpose:**  
+Spatially joins the lat/lon (and FIPS) from geocoding with geospatial indices (ADI, SVI, AHRQ) and produces `EXTERNAL_EXPOSURE.csv`.
+
+---
 
 #### Prerequisites for GIS Linkage
 - Docker installed.
-- Clone the [postgis-exposure repository](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure).
-- Update your `LOCATION` files to include the geocoded lat/lon from Step 2.
-- Prepare the site's `LOCATION_HISTORY`.
+- Clone [postgis-exposure repository](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure)
+- Updated `LOCATION`, `LOCATION_HISTORY` files to include the geocoded lat/lon from Step 2. Not needed if you included these during the geocoding step
 - Ensure `DATA_SRC_SIMPLE.csv` and `VRBL_SRC_SIMPLE.csv` files are available (centrally managed; no edits required).
-- **Important:** Do not date-shift your LOCATION/LOCATION_HISTORY files before linkage. Date shifting (if used) should occur following this step.
+- **Important:** Do **not** date-shift your `LOCATION`/`LOCATION_HISTORY` files before linkage. Date shifting (if used) should occur following this step.
 
-`DATA_SRC_SIMPLE.csv` and `VRBL_SRC_SIMPLE.csv` files can be found [here](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure/csv)
+Sample `LOCATION` and `LOCATION_HISTORY` files: [here] (https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure/test)
 
-Sample `LOCATION` and `LOCATION_HISTORY` files can be found [here](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure/test)
+`DATA_SRC_SIMPLE.csv` and `VRBL_SRC_SIMPLE.csv`: [here] (https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure/csv)
+
+---
 
 #### Expected Outputs
-- `EXTERNAL_EXPOSURE.csv` containing linked indices (ADI, SVI, AHRQ metrics, etc.).
+- `EXTERNAL_EXPOSURE.csv` containing linked indices (ADI, SVI, AHRQ metrics).
+
+---
 
 #### GIS Linkage Workflow
 
 1. **Start Postgres/PostGIS container** following the instructions in the [postgis-exposure repository](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure).
-
    Container sequence: start/load database → ingest location tables → run the produce script.
-
-2. **For the first Docker command (prepares the database):**
+   **First Docker command (prepares the database):**
 
    ```bash
    docker run --rm --name postgis-chorus \
@@ -312,22 +316,21 @@ Sample `LOCATION` and `LOCATION_HISTORY` files can be found [here](https://githu
      -v $(pwd)/test/source:/source \
      -d ghcr.io/chorus-ai/chorus-postgis-sdoh:main
    ```
-
    - Replace `VARIABLES` with the comma-separated list of variable IDs you need from `VRBL_SRC_SIMPLE.csv`.
    - Replace `DATA_SOURCES` with the relevant data source IDs (from `DATA_SRC_SIMPLE.csv`).
 
-3. **Run the second Docker command to generate the external exposure file:**
+2. ** Generate the external exposure file:**
 
    ```bash
    docker exec postgis-chorus /app/produce_external_exposure.sh
    ```
 
-4. **Output:** `EXTERNAL_EXPOSURE.csv` in your mounted directory (e.g., `./test/source`).
+3. **Output:** `EXTERNAL_EXPOSURE.csv` will appear in your mounted directory (e.g., `./test/source`).
 
 #### Notes & Tips
-- Run these commands in Terminal (Mac) or WSL/PowerShell/Command Prompt on Windows; WSL is usually more robust for Docker on Windows.
+- Run these commands in Terminal (Mac) or WSL/PowerShell/Command Prompt on Windows; WSL is more robust for Docker on Windows.
 - If your site needs more variables, expand `VARIABLES` accordingly.
-- **Note:** The Docker container may only run successfully once. If you need to run it again, you may need to delete the container and image, then pull the image again before re-running the command.
+- **Important**: The container may only run successfully once. To rerun, you may need to delete the container and image, then pull the image again.
 
 ---
 
