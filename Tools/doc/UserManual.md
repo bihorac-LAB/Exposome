@@ -185,7 +185,6 @@ If your file is named patients_address.csv inside 📂`input_address/`, run:
 ```bash
 docker run -it --rm   -v "$(pwd)":/workspace   -v /var/run/docker.sock:/var/run/docker.sock   -e HOST_PWD="$(pwd)"   -w /workspace   prismaplab/exposome-geocoder:1.0.3   /app/code/Address_to_FIPS.py -i input_address
 ```
----
 
 #### For OMOP Input (Option 3)
 To extract and geocode directly from an OMOP database:
