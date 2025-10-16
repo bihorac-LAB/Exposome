@@ -159,8 +159,6 @@ This step uses the Exposome Geocoder container to:
 - Convert addresses or coordinates into latitude/longitude
 - Assign 11-digit Census Tract (FIPS) codes
 
----
-
 #### For CSV Input (Option 1 & 2)
 
 ##### For macOS / Linux / Ubuntu
