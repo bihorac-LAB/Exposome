@@ -18,7 +18,7 @@ This repository provides a **reproducible workflow** to geocode patient location
     - [Step 1: Prepare Input Data](#step-1-prepare-input-data)
     - [Step 2: Generate FIPS Codes](#step-2-generate-fips-codes)
       - [CSV Input (Option 1 \& 2)](#csv-input-option-1--2)
-    - [OMOP Input (Option 3)](#omop-input-option-3)
+      - [For OMOP Input (Option 3)](#omop-input-option-3)
     - [Step 3: Output Structure](#step-3-output-structure)
       - [CSV Input (Option 1 \& 2)](#csv-input-option-1--2-1)
         - [Reason Column Values](#reason-column-values)
