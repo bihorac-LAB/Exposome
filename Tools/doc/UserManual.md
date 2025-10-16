@@ -49,7 +49,7 @@ This workflow uses **two separate Docker containers** to support end-to-end geoc
 1. **Exposome Geocoder Container (`prismaplab/exposome-geocoder:1.0.3`)**  
    Performs address or coordinate-based geocoding to generate Census Tract (FIPS 11-digit) codes using [DeGAUSS](https://degauss.org) backend tools.
 
-2. **Exposome Linkage Container (`prismaplab/exposome-linker:1.0.0`)**  
+2. **Exposome Linkage Container (`ghcr.io/chorus-ai/chorus-postgis-sdoh:main`)**  
    Integrates the geocoded outputs with relevant environmental and social determinant datasets to produce analysis-ready files.
 
 Together, these containers enable:  
