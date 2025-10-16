@@ -360,7 +360,7 @@ See [Date Shifting SOP for More Details](https://github.com/chorus-ai/Chorus_SOP
 
 ---
 
-### Step 8: Link with Exposome Web Platform
+### Step 8: Link with Exposome Web Platform (internal to UF)
 1. Register at [https://exposome.rc.ufl.edu](https://exposome.rc.ufl.edu/)  
 2. Upload `*_with_fips.zip` file obtained from Step 3 
 3. Input CSV must contain:  
