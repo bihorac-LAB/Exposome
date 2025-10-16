@@ -4,7 +4,7 @@
 
 This repository provides a **reproducible workflow** to geocode patient location data and link the resulting Census Tract (FIPS 11-digit) identifiers with Exposome datasets for environmental exposure analysis.
 
-> **Demo video** [Watch ere](https://www.loom.com/share/603607c1365342cb9fb2303566f529cc?sid=81cab3db-8189-4ad4-b1fd-baca7a73bf25)
+> **Demo video** [Watch here](https://www.loom.com/share/603607c1365342cb9fb2303566f529cc?sid=81cab3db-8189-4ad4-b1fd-baca7a73bf25)
 ---
 ## 📑 Table of Contents
 - [Geocoding Patient Data for Exposome Linkage](#geocoding-patient-data-for-exposome-linkage)
