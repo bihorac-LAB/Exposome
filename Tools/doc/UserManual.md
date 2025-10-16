@@ -1,4 +1,4 @@
-# Geocoding Patient Data for Exposome Linkage
+# Exposome Geocoder – Input Preparation and Usage Guide
 
 > **Note:** This toolkit does **not** require or share any Protected Health Information (PHI).
 
@@ -44,23 +44,22 @@ This repository provides a reproducible workflow to geocode patient location dat
 ---
 
 ## Overview
-This toolkit links patient data to SDoH databases via Census Tract (FIPS-11) codes.  
+This guide explains how to prepare and process input data using the Exposome Geocoder container (prismaplab/exposome-geocoder:1.0.3) to generate geocoded FIPS codes for addresses or coordinates. 
 
 It supports:  
 - Address-based geocoding  
 - Latitude/Longitude geocoding  
-- Extraction from OMOP CDM databases  
-- OMOP table CSVs (LOCATION.csv and LOCATION_HISTORY.csv)
+- Extraction from OMOP CDM databases geocoding
 
 The backend uses [DeGAUSS](https://degauss.org) Docker containers for geocoding.
 
 ---
 
 ## Input Options
-
 You need to prepare **only ONE** of the following data elements per encounter.  
+
 ### Option 1: Address
-Sample input files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/address_files/input)
+Sample input files [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/address_files/input)
 
 - **Format A: Multi-Column Address**
 
@@ -68,6 +67,8 @@ Sample input files can be found [here](https://github.com/bihorac-LAB/Exposome/t
 |------------------|--------------|-------|-------|------|----------------|
 | 1250 W 16th St   | Jacksonville | FL    | 32209 | 2019 | 1              |
 | 2001 SW 16th St  | Gainesville  | FL    | 32608 | 2019 | 2              |
+
+> **Tip:** Street **and** ZIP are required. Missing these fields may lead to **imprecise geocoding**.
 
 - **Format B: Single Column Address**
 
@@ -78,30 +79,35 @@ Sample input files can be found [here](https://github.com/bihorac-LAB/Exposome/t
 
 Optionally, you can include the CSV files for [`LOCATION`](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input/LOCATION.csv) and [`LOCATION_HISTORY`](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input/LOCATION_HISTORY.csv) in the input folder to process data:
 
-- **LOCATION.csv**
+---
+
+#### Optional Supporting Files
+You may include the following to enhance address processing:
+
+##### LOCATION.csv
 
 | location_id | address_1 | address_2 | city | state | zip | county | location_source_value | country_concept_id | country_source_value | latitude | longitude |
 |-------------|-----------|-----------|------|-------|-----|--------|----------------------|-------------------|---------------------|----------|-----------|
 | 1           | 1248 N Blackstone Ave | | FRESNO | CA | 93703 | | UNITED STATES OF AMERICA | | UNITED STATES OF AMERICA | 36.75891146 | -119.7902719 |
 
-- **LOCATION_HISTORY.csv**
+##### LOCATION_HISTORY.csv
 
 | location_id | relationship_type_concept_id | domain_id | entity_id | start_date | end_date |
 |-------------|------------------------------|-----------|-----------|------------|----------|
 | 1           | 32848                        | 1147314   | 3763      | 1998-01-01 | 2020-01-01 |
 
-These files will be validated for required columns.
-
-> **Tip:** Street **and** ZIP are required. Missing fields may result in imprecise geocoding.
+---
 
 ### Option 2: Coordinates
 
-Sample input files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input)
+Sample input files [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input)
 
 | latitude   | longitude | entity_id |
 |------------|-----------|-----------|
 | 30.353463  | -81.6749  | 1         |
 | 29.634219  | -82.3433  | 2         |
+
+---
 
 ### Option 3: OMOP CDM
 
@@ -113,28 +119,26 @@ Sample input files can be found [here](https://github.com/bihorac-LAB/Exposome/t
 | location_history   | location_id, relationship_type_concept_id, domain_id, entity_id, start_date, end_date |
 
 ---
-## Usage
+
+## Usage Guide
 
 ### Step 1: Prepare Input Data
-You need to prepare **only ONE** of the data elements as indicated under the [Input Options](#input-options) per encounter.  
+Prepare **only ONE** of the data elements as indicated under the [Input Options](#input-options) per encounter.  
 For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your data in a **CSV file**.  
 - Place the CSV file(s) in a dedicated folder (e.g., 📂`input_address/` or 📂`input_coordinates/`).
-- Optionally, include `LOCATION.csv` and `LOCATION_HISTORY.csv` files for address processing.
+- Optionally, include:
+  -    `LOCATION.csv`
+  -   `LOCATION_HISTORY.csv`
+> ⚠️ Only `.csv` files are supported. Convert `.xlsx` or other formats before running the tool.
+
+---
 
 ### Step 2: Generate FIPS Codes
-> Container: `prismaplab/exposome-geocoder:1.0.3`  
-> Ensure Docker Desktop is running.  
-> On Windows, run commands from WSL.
+**Container:** `prismaplab/exposome-geocoder:1.0.3`  
+Ensure **Docker Desktop** is running.  
 
 #### CSV Input (Option 1 & 2)
-
-> **If you are using Mac, Ubuntu, or any other Unix-based terminal:**
-- Run the below command in your terminal, providing the path to the input folder
-
-> **If you are using Windows, run the following commands:**
-- Open cmd or powershell
-- run command `wsl`
-- Run the below command in your `wsl` terminal, providing the path to the input folder
+##### For macOS / Linux / Ubuntu
 
 ```bash
 docker run -it --rm \
@@ -144,24 +148,22 @@ docker run -it --rm \
   -w /workspace \
   prismaplab/exposome-geocoder:1.0.3 \
   /app/code/Address_to_FIPS.py -i <input_folder_path>
-```
+
+#### For Windows
+- Open cmd or powershell
+- run command `wsl`
+- execute the same command as above inside your WSL terminal.
+
 Example:
 
 If you have a file called patients_address.csv under 📂`input_address/`, then run:
 
 ```bash
-docker run -it --rm \
-  -v "$(pwd)":/workspace \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -e HOST_PWD="$(pwd)" \
-  -w /workspace \
-  prismaplab/exposome-geocoder:1.0.3 \
-  /app/code/Address_to_FIPS.py -i input_address
+docker run -it --rm   -v "$(pwd)":/workspace   -v /var/run/docker.sock:/var/run/docker.sock   -e HOST_PWD="$(pwd)"   -w /workspace   prismaplab/exposome-geocoder:1.0.3   /app/code/Address_to_FIPS.py -i input_address
 ```
-⚠️ Note: Only .csv files are supported for Options 1 & 2. If your data is in Excel (.xlsx) or another format, please convert it to CSV before running the command.
+---
 
-
-### OMOP Input (Option 3)
+### OMOP Input Command (Option 3)
 
 ```bash
 docker run -it --rm \
@@ -180,22 +182,24 @@ docker run -it --rm \
 ---
 
 ### Step 3: Output Structure
-When you run the Docker command in Step2 (for Option 1, 2, or 3), the pipeline generates a zipped file with the following structure:
+When you run the Docker command in Step2 (for Option 1, 2, or 3), it generates two ZIP archives and additional files under the `output/` folder.
 
 #### CSV Input (Option 1 & 2)
-Sample output files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/address_files/output)
+Sample outputs [demo/address_files/output](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/address_files/output)
 
-Generated per file:
+**Generated per file:**
   - `<filename>_with_coordinates.csv` — input + latitude/longitude  
   - `<filename>_with_fips.csv` — input + FIPS codes  
 
-Zipped outputs:
-- All generated files are compressed into two separate ZIP archives for convenience:
-  - `output/coordinates_from_address_<timestamp>.zip`
-  - `output/geocoded_fips_codes_<timestamp>.zip`
-- Note: `<timestamp>` is a datetime string indicating when the script was executed (e.g., 20250624_150230).
+**Zipped outputs:**
+  ```
+  output/
+  ├── coordinates_from_address_<timestamp>.zip
+  ├── geocoded_fips_codes_<timestamp>.zip
+  ```
+> `<timestamp>` indicates when the script was executed (e.g., 20250624_150230).
 
-If `LOCATION.csv` and `LOCATION_HISTORY.csv` are provided, they will be copied to the output folder. These files are not included in the zip archives.
+If `LOCATION.csv` and `LOCATION_HISTORY.csv` were included, they are copied to `output/` but not zipped.
 
 **Zipped Output Columns Description**
 
@@ -214,8 +218,7 @@ Used when geocoding fails or is imprecise. Possible values include:
 - **Blank/Incomplete address** – Address is empty or has missing components.  
 - **Zip missing** – ZIP code not provided.  
 
-##### Improving Hospital Address Detection
-> Tip: Improve hospital address detection by adding addresses under the variable HOSPITAL_ADDRESSES in [`Address_to_FIPS.py`](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/code/Address_to_FIPS.py) 
+> 💡 **Tip:** You can improve hospital detection by adding known addresses to `HOSPITAL_ADDRESSES` in [`Address_to_FIPS.py`](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/code/Address_to_FIPS.py).
 
 ###### Note on `HOSPITAL_ADDRESSES` Format
 
@@ -224,10 +227,12 @@ When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FI
 - Is written as a full, single-line string.  
 - Uses only lowercase letters and numbers.  
 - Has no commas or special characters.  
-- Fields are separated by single spaces.  
+- Fields are separated by single spaces.
+  
 ---
+
 #### OMOP Input (Option 3)
-Sample output files can be found [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/OMOP/output)
+Sample outputs: [demo/OMOP/output](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/OMOP/output)
 
 ```
 OMOP_data/
