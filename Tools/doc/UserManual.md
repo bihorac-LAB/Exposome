@@ -371,16 +371,16 @@ See [Date Shifting SOP for More Details](https://github.com/chorus-ai/Chorus_SOP
 4. Select the dataset you want to link it to
 5. Download enriched dataset with SDoH variables
 
-
-### References & sample files
-- Geocoding:
-  - Sample Files
-- GIS Linkage:
-  - Sample Files
-    - Site-specific -> `LOCATION`, `LOCATION_HISTORY`
-    - Centrally managed -> `DATA_SRC_SIMPLE`, `VRBL_SRC_SIMPLE`
 ---
+### References & sample files
+#### Geocoding
+- Sample files: [Geocoding Demo Files](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo)
 
+#### GIS Linkage
+- Sample files: [PostGIS Exposure CSVs](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure/csv)
+  - **Site-specific:** `LOCATION`, `LOCATION_HISTORY`
+  - **Centrally managed:** `DATA_SRC_SIMPLE`, `VRBL_SRC_SIMPLE`
+---
 
 ## Related Office Hours
 
