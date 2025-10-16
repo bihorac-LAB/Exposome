@@ -370,6 +370,34 @@ See [Date Shifting SOP for More Details](https://github.com/chorus-ai/Chorus_SOP
    - `FIPS`
 4. Select the dataset you want to link it to
 5. Download enriched dataset with SDoH variables
+
+
+### References & sample files
+- Geocoding:
+  - Sample Files
+- GIS Linkage:
+  - Sample Files
+    - Site-specific -> `LOCATION`, `LOCATION_HISTORY`
+    - Centrally managed -> `DATA_SRC_SIMPLE`, `VRBL_SRC_SIMPLE`
+---
+
+
+## Related Office Hours
+
+The following office hour sessions provide additional context and demonstrations related to this SOP:
+
+- **[08-07-25] Integration of GIS and SDoH data with OMOP**
+  - [Video Recording](https://drive.google.com/file/d/1MHx7YWlWIVC2Dggjzw2uczT3MKyppWZ5/view?usp=share_link) | [Transcript](https://docs.google.com/document/d/1v0C3COo1O-KOKpd7haVm5GGmD5gbVR0I/edit?usp=sharing&ouid=104468275537210259794&rtpof=true&sd=true)
+  - Comprehensive session on integrating GIS and social determinants of health data
+
+- **[09-18-25] Processing OMOP location_history table into external_exposure table**
+  - [Video Recording](https://drive.google.com/file/d/1SWovm3vnf0PVbTC_qS6n3nBuf1dI169L/view?usp=share_link) | [Transcript](https://docs.google.com/document/d/1VII2X_NQhM69ZzUDwB6m4hsqDk6E1VCx/edit?usp=share_link&ouid=104468275537210259794&rtpof=true&sd=true)
+  - Technical implementation of location data processing for external exposures
+
+- **[09-25-25] End-to-end demo for capturing GIS data with OMOP**
+  - [Video Recording](https://drive.google.com/file/d/118fGVQS0ES0SV4Yu6pxLc4SB0Z08Mq9I/view?usp=share_link) | [Transcript](https://docs.google.com/document/d/1-rPcdQp-7TcEF9-Fgwqi12508Mx2seT9/edit?usp=share_link&ouid=104468275537210259794&rtpof=true&sd=true)
+  - Complete workflow demonstration for GIS data capture and processing
+
 ---
 
 ## Appendix
