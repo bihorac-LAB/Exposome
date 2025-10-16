@@ -222,12 +222,10 @@ Used when geocoding fails or is imprecise. Possible values include:
 > 💡 **Tip:** You can improve hospital detection by adding known addresses to `HOSPITAL_ADDRESSES` in [`Address_to_FIPS.py`](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/code/Address_to_FIPS.py).
 
 **Note on `HOSPITAL_ADDRESSES` Format**
-
-When adding hospital addresses to the `HOSPITAL_ADDRESSES` set in `Address_to_FIPS.py`, ensure each address:
-- Is written as a full, single-line string.  
-- Uses only lowercase letters and numbers.  
-- Has no commas or special characters.  
-- Fields are separated by single spaces.
+  - Is written as a full, single-line string.  
+  - Uses only lowercase letters and numbers.  
+  - Has no commas or special characters.  
+  - Fields are separated by single spaces.
   
 ---
 
