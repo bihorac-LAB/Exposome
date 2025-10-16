@@ -25,7 +25,7 @@ This repository provides a **reproducible workflow** to geocode patient location
         - [Improving Hospital Address Detection](#improving-hospital-address-detection)
           - [Note on `HOSPITAL_ADDRESSES` Format](#note-on-hospital_addresses-format)
       - [OMOP Input (Option 3)](#omop-input-option-3-1)
-    - [Step 4: GIS Linkage with PostGIS-Exposure Tool](#step-4-gis-linkage-with-postgis-exposome-tool)
+    - [Step 4: GIS Linkage with PostGIS-Exposure Tool](#step-4-gis-linkage-with-postgis-exposure-tool)
       - [Prerequisites for GIS Linkage](#prerequisites-for-gis-linkage)
       - [Expected Outputs](#expected-outputs)
       - [GIS Linkage Workflow](#gis-linkage-workflow)
