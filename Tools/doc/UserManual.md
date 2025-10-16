@@ -83,7 +83,8 @@ Sample input files [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tool
 #### Optional Supporting Files
 
 Including the following optional files will help streamline the **end-to-end workflow** between geocoding and exposome linkage:
-
+- **Important**: Do not date-shift your LOCATION/LOCATION_HISTORY files before linkage. Date shifting (if used) should occur post linkage in Step 4.
+- 
 - [`LOCATION.csv`](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input/LOCATION.csv)  
 - [`LOCATION_HISTORY.csv`](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input/LOCATION_HISTORY.csv)
 
