@@ -208,7 +208,7 @@ docker run -it --rm \
 ### Step 3: Output Structure
 After running the geocoder container (for Option 1, 2, or 3), the tool generates output files in the `output/` folder.
 
-#### ** CSV Input (Option 1 & 2)**
+#### **CSV Input (Option 1 & 2)**
 **Sample outputs** [demo/address_files/output](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/address_files/output)
 
 **Files Generated**
