@@ -149,7 +149,7 @@ docker run -it --rm \
   prismaplab/exposome-geocoder:1.0.3 \
   /app/code/Address_to_FIPS.py -i <input_folder_path>
 
-#### For Windows
+##### For Windows
 - Open cmd or powershell
 - run command `wsl`
 - execute the same command as above inside your WSL terminal.
