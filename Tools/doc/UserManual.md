@@ -4,7 +4,7 @@
 
 This repository provides a **reproducible workflow** to geocode patient location data and link the resulting Census Tract (FIPS 11-digit) identifiers with Exposome datasets for environmental exposure analysis.
 
-> **Demo video** [Watch here](https://www.loom.com/share/603607c1365342cb9fb2303566f529cc?sid=81cab3db-8189-4ad4-b1fd-baca7a73bf25)
+> **Demo video** [Watch here](https://drive.google.com/drive/folders/14FdY0lB3WRIiYrgCdeje6NAQI7Q_RB2w?usp=sharing)
 ---
 ## 📑 Table of Contents
 - [Geocoding Patient Data for Exposome Linkage](#geocoding-patient-data-for-exposome-linkage)
@@ -397,6 +397,10 @@ The following office hour sessions provide additional context and demonstrations
 - **[09-25-25] End-to-end demo for capturing GIS data with OMOP**
   - [Video Recording](https://drive.google.com/file/d/118fGVQS0ES0SV4Yu6pxLc4SB0Z08Mq9I/view?usp=share_link) | [Transcript](https://docs.google.com/document/d/1-rPcdQp-7TcEF9-Fgwqi12508Mx2seT9/edit?usp=share_link&ouid=104468275537210259794&rtpof=true&sd=true)
   - Complete workflow demonstration for GIS data capture and processing
+
+- **[10-16-2025] End-to-end demo for capturing GIS data with OMOP or address/latlong**
+  - [Video Recording](https://drive.google.com/file/d/1L5OdVWa0AsuLKy-o0Uub8JNb1Wojw7ZO/view?usp=drive_link) | [Transcript](https://drive.google.com/file/d/1-P6edkHBfiAJKSG7ZKlkIj5Ej-u2EZ3G/view?usp=sharing)
+  - Complete workflow demonstration for GIS data capture and processing based on updated documentation
 
 ---
 
