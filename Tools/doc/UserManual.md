@@ -20,7 +20,7 @@ This repository provides a **reproducible workflow** to geocode patient location
       - [For CSV Input (Option 1 & 2)](#for-csv-input-option-1--2)
       - [For OMOP Input (Option 3)](#for-omop-input-option-3)
     - [Step 3: Output Structure](#step-3-output-structure)
-      - [CSV Input (Option 1 & 2)](#csv-input-option-1-2)
+      - [CSV Input (Option 1 & 2)](#csv-input-option-1--2)
         - [Reason Column Values](#reason-column-values)
         - [Improving Hospital Address Detection](#improving-hospital-address-detection)
           - [Note on `HOSPITAL_ADDRESSES` Format](#note-on-hospital_addresses-format)
