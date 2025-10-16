@@ -291,9 +291,7 @@ Spatially joins the lat/lon (and FIPS) from geocoding with geospatial indices (A
 - Ensure `DATA_SRC_SIMPLE.csv` and `VRBL_SRC_SIMPLE.csv` files are available (centrally managed; no edits required).
 - **Important:** Do **not** date-shift your `LOCATION`/`LOCATION_HISTORY` files before linkage. Date shifting (if used) should occur following this step.
 
-Sample `LOCATION` and `LOCATION_HISTORY` files: [here] (https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure/test)
-
-`DATA_SRC_SIMPLE.csv` and `VRBL_SRC_SIMPLE.csv`: [here] (https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure/csv)
+Sample `DATA_SRC_SIMPLE.csv` and `VRBL_SRC_SIMPLE.csv`: [here](https://github.com/chorus-ai/chorus-container-apps/tree/main/postgis-exposure/csv)
 
 ---
 
