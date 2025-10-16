@@ -138,8 +138,8 @@ For **Option 1 (Address)** or **Option 2 (Coordinates)**, you must provide your 
 Ensure **Docker Desktop** is running.  
 
 #### CSV Input (Option 1 & 2)
-##### For macOS / Linux / Ubuntu
 
+##### For macOS / Linux / Ubuntu
 ```bash
 docker run -it --rm \
   -v "$(pwd)":/workspace \
@@ -148,6 +148,7 @@ docker run -it --rm \
   -w /workspace \
   prismaplab/exposome-geocoder:1.0.3 \
   /app/code/Address_to_FIPS.py -i <input_folder_path>
+```
 
 ##### For Windows
 - Open cmd or powershell
