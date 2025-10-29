@@ -40,7 +40,15 @@ To protect patient privacy, geocoding should be executed **locally**. Our toolki
 
 > If your institution already provides geocoding services, you may skip these toolkits.
 
-Detailed instructions are available [here](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/doc/UserManual.md).
+### Documentation (Wiki)
+
+- **[Home](https://github.com/bihorac-LAB/Exposome/wiki/Home)** - Overview and quick navigation
+- **[Input Preparation](https://github.com/bihorac-LAB/Exposome/wiki/Input-Preparation)** - Prepare your address, coordinate, or OMOP data
+- **[Running the Geocoder](https://github.com/bihorac-LAB/Exposome/wiki/Running-the-Geocoder)** - Execute geocoding to generate FIPS codes
+- **[Understanding Outputs](https://github.com/bihorac-LAB/Exposome/wiki/Understanding-Outputs)** - Interpret geocoded results and FIPS codes
+- **[GIS Linkage](https://github.com/bihorac-LAB/Exposome/wiki/GIS-Linkage)** - Link geocoded data with SDoH indices using PostGIS
+
+[User Manual (single page)](https://github.com/bihorac-LAB/Exposome/blob/main/Tools/doc/UserManual.md)
 
 ### Demo Videos
 - [FIPS Generation](https://www.loom.com/share/603607c1365342cb9fb2303566f529cc?sid=81cab3db-8189-4ad4-b1fd-baca7a73bf25)  
