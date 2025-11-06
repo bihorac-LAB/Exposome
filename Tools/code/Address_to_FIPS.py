@@ -313,7 +313,7 @@ def generate_fips_degauss(df, year, output_folder):
     if os.path.exists(output_file):
         logger.info(f"Output file generated: {output_file}")
         df = pd.read_csv(output_file)
-        # df['FIPS'] = df[f'census_tract_id_{year}']
+        df['FIPS'] = df[f'census_tract_id_{year}']
         df.drop(columns=[f'census_block_group_id_{year}', f'census_tract_id_{year}'], inplace=True)
         df.to_csv(output_file, index=False)
         return output_file
@@ -455,10 +455,14 @@ def process_csv_file(file, input_folder, final_coordinate_files, main_output_fol
             final_df = pd.concat(generated_dfs, ignore_index=True) if len(generated_dfs) > 1 else generated_dfs[0]
             if base_filename.lower() == 'location':
                 output_path = os.path.join(main_output_folder, 'LOCATION.csv')
+                # Remove FIPS column from LOCATION.csv before saving
+                location_df = final_df.drop(columns=['FIPS'], errors='ignore')
+                location_df.to_csv(output_path, index=False)
+                logger.info(f"LOCATION.csv generated without FIPS column: {output_path}")
             else:
                 output_path = encounter_with_fips_file
-            final_df.to_csv(output_path, index=False)
-            logger.info(f"Final encounter file with FIPS generated: {output_path}")
+                final_df.to_csv(output_path, index=False)
+                logger.info(f"Final encounter file with FIPS generated: {output_path}")
         else:
             logger.error("Error: No FIPS files were generated successfully.")
             return None
