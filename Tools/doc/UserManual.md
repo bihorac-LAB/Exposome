@@ -110,10 +110,10 @@ If they are **not provided**, users will need to **manually update their LOCATIO
 
 Sample input files [here](https://github.com/bihorac-LAB/Exposome/tree/main/Tools/demo/latlong_files/input)
 
-| latitude   | longitude | entity_id |
-|------------|-----------|-----------|
-| 30.353463  | -81.6749  | 1         |
-| 29.634219  | -82.3433  | 2         |
+| latitude   | longitude | entity_id | year
+|------------|-----------|-----------|-------
+| 30.353463  | -81.6749  | 1         | 2015
+| 29.634219  | -82.3433  | 2         | 2015
 
 As with address-based input, including `LOCATION.csv` and `LOCATION_HISTORY.csv` enables seamless downstream processing with the linkage container.
 
